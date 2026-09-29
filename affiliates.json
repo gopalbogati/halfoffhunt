@@ -1,5 +1,9 @@
 {
   "_how": "Once a retailer approves you (Commission Factory, Impact, Partnerize, Rakuten, Awin), paste its deep-link template here keyed by domain. {url} = URL-encoded product link, {raw_url} = plain. Every product link on the site, RSS and alerts is rewritten automatically on the next scan.",
-  "_example": {"www.culturekings.com.au": "https://t.cfjump.com/YOUR_ID/t/MERCHANT_ID?Url={url}"},
-  "templates": {}
+  "_example": {
+    "www.culturekings.com.au": "https://t.cfjump.com/YOUR_ID/t/MERCHANT_ID?Url={url}"
+  },
+  "templates": {},
+  "direct_links": {},
+  "_direct_links_help": "Exact original retailer URL -> complete tracking link copied from your approved account. Used for opted-in directory links. No API secrets or fabricated IDs."
 }

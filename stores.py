@@ -44,10 +44,8 @@ def store_currency(domain):
 
 
 def affiliate(url, domain, affs):
-    tpl = affs.get(domain) or affs.get(domain.removeprefix("www."))
-    if not tpl:
-        return url
-    return tpl.replace("{url}", urllib.parse.quote(url, safe="")).replace("{raw_url}", url)
+    from affiliate_links import resolve
+    return resolve(url, affs)
 
 
 def best_variant(p):

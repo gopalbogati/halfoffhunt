@@ -38,7 +38,7 @@ STORE_FEEDS = ["amazon.com.au", "jbhifi.com.au", "kmart.com.au", "bigw.com.au", 
     "costco.com.au", "aldi.com.au", "apple.com", "samsung.com", "dell.com", "lenovo.com",
     "chemistwarehouse.com.au", "priceline.com.au", "rebelsport.com.au", "dyson.com.au",
     "appliancesonline.com.au", "mwave.com.au", "scorptec.com.au", "pccasegear.com", "umart.com.au",
-    "binglee.com.au", "kogan.com", "hp.com", "ebgames.com.au", "centrecom.com.au", "ple.com.au"]
+    "binglee.com.au", "kogan.com", "hp.com", "ebgames.com.au", "centrecom.com.au", "ple.com.au", "reebelo.com.au", "backmarket.com.au", "greengadgets.net.au", "cashconverters.com.au"]
 STORE_FEEDS_PER_RUN = 4
 ERROR_WORDS = re.compile(
     r"price[\s-]*error|pricing[\s-]*(error|mistake|glitch)|price[\s-]*mistake|glitch|"
@@ -176,6 +176,16 @@ def food_score(d, price, was, pct):
     return sc, rs
 
 
+def condition_label(title):
+    if re.search(r"\b(refurb(?:ished)?|renewed|reconditioned|ex[- ]lease)\b", title, re.I):
+        return "Refurbished / ex-lease"
+    if re.search(r"\b(open[- ]box|ex[- ]demo|scratch[- ]and[- ]dent)\b", title, re.I):
+        return "Open-box / ex-demo"
+    if re.search(r"\b(pre[- ]?owned|second[- ]hand|used)\b", title, re.I):
+        return "Second-hand / preowned"
+    return "Condition not stated"
+
+
 def tech_matches(title, price, votes):
     """Personal interests, not a claim of historical-low pricing or verified value."""
     if price is None or votes < TECH_CONFIG.get("minimum_votes", 3):
@@ -237,7 +247,11 @@ def classify(d):
     store = re.search(r"@\s*([^@]+)$", t)
     if store and reasons and any(b.lower() in store.group(1).lower() for b in BIG_STORES):
         reasons.append("big store"); score += 20
-    for category in tech_matches(t, price, d["votes_pos"] - d["votes_neg"]):
+    d["condition"] = condition_label(t)
+    categories = tech_matches(t, price, d["votes_pos"] - d["votes_neg"])
+    if categories and d["condition"] != "Condition not stated":
+        reasons.append(d["condition"])
+    for category in categories:
         reasons.append("Tech: " + category)
         score += 40
     for k in WATCH_KEYWORDS:
@@ -415,6 +429,7 @@ def write_html(state, now):
         if any("watch" in r for r in v["reasons"]): kinds.append("watch")
         if any(r.startswith("Tech:") for r in v["reasons"]): kinds.append("tech")
         if "FOOD" in v["reasons"]: kinds.append("food")
+        if v.get("condition", "Condition not stated") != "Condition not stated": kinds.append("used")
         tags = "".join(
             f'<span class="tag {"e" if "ERROR" in r else "d" if ("off" in r or "FREE" in r or r == "FOOD") else ""}">{html.escape(r)}</span>'
             for r in v["reasons"])
@@ -440,7 +455,7 @@ def write_html(state, now):
 <div class="sub">{len(hits)} live, non-expired hits · updated {now:%a %H:%M:%S} · page refreshes every 60s · ALWAYS read the comments: errors get cancelled and "expired" flags lag</div></header>
 <div class="bar"><button class="chip on" data-f="all">All</button><button class="chip" data-f="error">Price errors</button>
 <button class="chip" data-f="free">Free</button><button class="chip" data-f="deep">{MIN_DISCOUNT_PCT}%+ off</button>
-<button class="chip" data-f="cheap">Under ${CHEAP_UNDER:g}</button><button class="chip" data-f="food">🍔 Food ({MY_STATE})</button><button class="chip" data-f="watch">My keywords</button><button class="chip" data-f="tech">Laptops, PS5 &amp; tech</button></div>
+<button class="chip" data-f="cheap">Under ${CHEAP_UNDER:g}</button><button class="chip" data-f="food">🍔 Food ({MY_STATE})</button><button class="chip" data-f="watch">My keywords</button><button class="chip" data-f="tech">Laptops, PS5 &amp; tech</button><button class="chip" data-f="used">Used / refurbished</button></div>
 <main>{body}</main><script>{JS}</script></body></html>'''
     with open(OUT, "w") as f:
         f.write(page)

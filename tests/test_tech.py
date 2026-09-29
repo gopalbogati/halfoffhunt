@@ -16,7 +16,7 @@ class TechTests(unittest.TestCase):
     def test_rotation_covers_every_store_without_clock_dependence(self):
         with tempfile.TemporaryDirectory() as tmp, patch.object(ozwatch,'FEED_CURSOR',str(Path(tmp)/'cursor.json')):
             seen=[]
-            for _ in range(9):seen.extend(ozwatch.rotated_stores())
+            for _ in range((len(ozwatch.STORE_FEEDS)+3)//4):seen.extend(ozwatch.rotated_stores())
             self.assertEqual(seen,ozwatch.STORE_FEEDS)
     def test_laptop_below_fifty_percent_matches(self):
         score,reasons=ozwatch.classify(deal())
@@ -29,6 +29,12 @@ class TechTests(unittest.TestCase):
     def test_laptop_stand_and_low_votes_excluded(self):
         self.assertEqual(ozwatch.tech_matches('Laptop stand $299',299,10),[])
         self.assertEqual(ozwatch.tech_matches('ThinkPad Laptop $999',999,2),[])
+    def test_used_condition_and_budget_laptop(self):
+        self.assertEqual(ozwatch.condition_label('[Refurb] ThinkPad T480 $149'),'Refurbished / ex-lease')
+        self.assertEqual(ozwatch.condition_label('Preowned PS5 Console $499'),'Second-hand / preowned')
+        self.assertEqual(ozwatch.condition_label('Open-box iPad $399'),'Open-box / ex-demo')
+        self.assertEqual(ozwatch.condition_label('Laptop $999'),'Condition not stated')
+        self.assertIn('Laptops',ozwatch.tech_matches('[Refurb] ThinkPad $149',149,5))
     def test_expiry_handles_naive_dates(self):
         self.assertTrue(ozwatch.is_expired(dict(title='PS5',expiry='2020-01-01T00:00:00'),datetime.now(timezone.utc)))
     def test_alert_mode_caches_no_content_and_deduplicates(self):

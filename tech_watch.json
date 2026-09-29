@@ -6,7 +6,7 @@
       "name": "Laptops",
       "pattern": "\\b(laptops?|notebooks?|macbook|thinkpad|ideapad|vivobook|zenbook|omnibook|chromebook|legion [579]|yoga slim)\\b",
       "exclude": "\\b(sleeve|stand|bag|case|charger|dock|screen protector)\\b",
-      "minimum_price": 200
+      "minimum_price": 75
     },
     {
       "name": "PS5 consoles",
@@ -24,6 +24,24 @@
       "name": "PC parts & monitors",
       "pattern": "\\b(rtx\\s*\\d{4}|rx\\s*\\d{4}|ryzen|core ultra|ssd|nvme|ddr[45]|monitor)\\b",
       "exclude": "\\b(cable|adapter|mount|stand)\\b",
+      "minimum_price": 30
+    },
+    {
+      "name": "Phones & tablets",
+      "pattern": "\\b(iphone|ipad|galaxy|pixel|tablets?|smartphones?)\\b",
+      "exclude": "\\b(case|cover|screen protector|cable|charger)\\b",
+      "minimum_price": 50
+    },
+    {
+      "name": "Audio & wearables",
+      "pattern": "\\b(headphones?|earbuds?|airpods?|soundbar|smartwatch|apple watch|garmin)\\b",
+      "exclude": "\\b(case|cover|strap|band only)\\b",
+      "minimum_price": 20
+    },
+    {
+      "name": "Cameras & smart home",
+      "pattern": "\\b(mirrorless|dslr|gopro|camera|doorbell|router|mesh wi-?fi|smart tv|oled tv)\\b",
+      "exclude": "\\b(case|cover|screen protector|cable|mount)\\b",
       "minimum_price": 30
     }
   ]

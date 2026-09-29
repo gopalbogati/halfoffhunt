@@ -94,3 +94,11 @@ GitHub uses `ozwatch.py --alerts-only`: only SHA-256 deal-ID notification finger
 - OzBargain: published RSS routes support personal feed discovery. Terms: https://www.ozbargain.com.au/wiki/help:terms . Store feed description: https://blog.ozbargain.com.au/2008/full-feed-for-your-stor/ . No commercial republication is enabled and private mode is not a permissions workaround.
 - Other retailers: official sales/catalogue/coupon links are recorded in `tech_sources.json`. Direct feed/API republication rights have not been established, so no new retailer inventory scraper is enabled.
 - The local research runtime received HTTP 403 from tested OzBargain RSS requests. Feed operation is therefore verified separately on the existing Actions runner; if blocked there too, the watcher reports failure rather than claiming current data.
+
+## Used/refurbished tech, affiliate activation and project sharing
+
+`refurbished.html` provides nine official retailer/marketplace discovery sources, condition labels and practical purchase checks. The private watcher labels condition from the title (never assumes an unspecified item is new), matches lower-priced refurbished laptops and includes phones, tablets, audio, wearables, cameras and smart-home tech. It now rotates 40 retailer feeds: ten runs per cycle, about 50 minutes at the five-minute Actions schedule or 150 minutes locally at 15 minutes, plus scan time/delays.
+
+`project.html` is a shareable development showcase with original social artwork, public-beta limitations, repository link, LinkedIn share button and copyable draft. This does not automatically post to LinkedIn.
+
+See [AFFILIATE-SETUP.md](AFFILIATE-SETUP.md) for official application links and the `configure_affiliate.py` command. No earning IDs are active by default. Approved links are visibly labelled, and private community feed content is not monetised or republished by this feature.

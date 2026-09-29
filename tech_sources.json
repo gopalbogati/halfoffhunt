@@ -10,7 +10,10 @@
         "Laptops",
         "PS5 & gaming",
         "PC parts",
-        "Tech"
+        "Tech",
+        "Phones & tablets",
+        "Audio & wearables",
+        "Cameras & smart home"
       ],
       "note": "Browse Amazon deals; check seller, delivery and Prime requirements.",
       "mode": "direct_link",
@@ -23,7 +26,10 @@
       "categories": [
         "Laptops",
         "PS5 & gaming",
-        "Tech"
+        "Tech",
+        "Phones & tablets",
+        "Audio & wearables",
+        "Cameras & smart home"
       ],
       "note": "Compare the exact console bundle or laptop configuration.",
       "mode": "direct_link",
@@ -182,7 +188,10 @@
       "categories": [
         "Laptops",
         "PS5 & gaming",
-        "Tech"
+        "Tech",
+        "Phones & tablets",
+        "Audio & wearables",
+        "Cameras & smart home"
       ],
       "note": "Check marketplace seller, import status and membership pricing.",
       "mode": "direct_link",

@@ -1,0 +1,114 @@
+{
+  "checked_on": "2026-09-29",
+  "stores": [
+    {
+      "name": "Apple Certified Refurbished",
+      "domain": "apple.com",
+      "url": "https://www.apple.com/au/shop/refurbished",
+      "categories": [
+        "Laptops",
+        "Phones & tablets",
+        "Audio"
+      ],
+      "condition": "Refurbished",
+      "note": "Check the available model, included accessories and warranty on Apple\u2019s listing."
+    },
+    {
+      "name": "Dell Outlet",
+      "domain": "dell.com",
+      "url": "https://dellau-prod.prod-auoutlet.dell.com/shop/laptops-tablets",
+      "categories": [
+        "Laptops",
+        "PC parts"
+      ],
+      "condition": "Outlet / refurbished",
+      "note": "Read the listed condition: refurbished, previously ordered new and scratch-and-dent are different."
+    },
+    {
+      "name": "eBay Refurbished",
+      "domain": "ebay.com.au",
+      "url": "https://www.ebay.com.au/b/Refurbished-Electronics/bn_7115877855",
+      "categories": [
+        "Laptops",
+        "Phones & tablets",
+        "PS5 & gaming",
+        "PC parts"
+      ],
+      "condition": "Refurbished",
+      "note": "Check the seller, refurbishment grade and item-specific warranty."
+    },
+    {
+      "name": "Amazon Renewed",
+      "domain": "amazon.com.au",
+      "url": "https://www.amazon.com.au/renewed",
+      "categories": [
+        "Laptops",
+        "Phones & tablets",
+        "PS5 & gaming",
+        "Audio"
+      ],
+      "condition": "Refurbished",
+      "note": "Check Renewed eligibility, seller and the guarantee shown on the product page."
+    },
+    {
+      "name": "Reebelo",
+      "domain": "reebelo.com.au",
+      "url": "https://reebelo.com.au/",
+      "categories": [
+        "Laptops",
+        "Phones & tablets",
+        "Audio"
+      ],
+      "condition": "Refurbished",
+      "note": "Check battery options, cosmetic grade, seller and any additional fees."
+    },
+    {
+      "name": "Back Market",
+      "domain": "backmarket.com.au",
+      "url": "https://www.backmarket.com.au/en-au",
+      "categories": [
+        "Laptops",
+        "Phones & tablets",
+        "Audio"
+      ],
+      "condition": "Refurbished",
+      "note": "Compare cosmetic grade, battery specification and seller terms."
+    },
+    {
+      "name": "Green Gadgets",
+      "domain": "greengadgets.net.au",
+      "url": "https://shop.greengadgets.net.au/",
+      "categories": [
+        "Laptops",
+        "Phones & tablets",
+        "Audio"
+      ],
+      "condition": "Refurbished",
+      "note": "Read the listed condition and battery specification before ordering."
+    },
+    {
+      "name": "Cash Converters",
+      "domain": "cashconverters.com.au",
+      "url": "https://www.cashconverters.com.au/shop",
+      "categories": [
+        "Laptops",
+        "Phones & tablets",
+        "PS5 & gaming",
+        "Cameras",
+        "Audio"
+      ],
+      "condition": "Second-hand",
+      "note": "Inspect listing photos and confirm condition, included accessories and delivery."
+    },
+    {
+      "name": "EB Games Preowned",
+      "domain": "ebgames.com.au",
+      "url": "https://www.ebgames.com.au/featured/preowned",
+      "categories": [
+        "PS5 & gaming"
+      ],
+      "condition": "Preowned / refurbished",
+      "note": "Confirm whether the item is preowned or refurbished and which controller and cables are included."
+    }
+  ]
+}
