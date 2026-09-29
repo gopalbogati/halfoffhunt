@@ -5,7 +5,6 @@ It combines a searchable deal index with retailer directories for laptops, gamin
 The engineering focus has been reliable scans, clear data freshness, exact product-variant links and honest coverage. Retailer directory links are separate from scanned product prices, and affiliate support requires approved account links.
 
 Live project: https://halfoffhunt.pages.dev/project
-Source: https://github.com/gopalbogati/halfoffhunt
 
 Feedback on the UX, accessibility and architecture is welcome.
 
