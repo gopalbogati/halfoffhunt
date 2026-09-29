@@ -10,7 +10,7 @@ cfg = json.load(open(os.path.join(HERE, "site_config.json")))
 affiliates = json.loads(Path(HERE, "affiliates.json").read_text())
 vals = {"brand": cfg["brand"], "tagline": cfg["tagline"], "site_url": cfg["site_url"].rstrip("/"),
         "ntfy": cfg.get("public_ntfy_topic", ""), "telegram_url": cfg.get("telegram_url", ""),
-        "today": date.today().strftime("%-d %B %Y")}
+        "contact_email": cfg.get("contact_email", ""), "today": date.today().strftime("%-d %B %Y")}
 vals["project_share_url"] = quote(vals["site_url"] + "/project.html", safe="")
 src, out = os.path.join(HERE, "site_src"), os.path.join(HERE, "site")
 os.makedirs(out, exist_ok=True)
