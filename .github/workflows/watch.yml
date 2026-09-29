@@ -27,6 +27,7 @@ jobs:
         with:
           path: |
             private_alert_state.json
+            feed_cursor.json
             stores_state.json
             site/data
             site/feed.xml
@@ -49,6 +50,7 @@ jobs:
         with:
           path: |
             private_alert_state.json
+            feed_cursor.json
             stores_state.json
             site/data
             site/feed.xml

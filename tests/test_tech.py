@@ -13,6 +13,11 @@ def deal(i=1,title='Laptop Intel Core Ultra 7 32GB $999 @ Amazon AU'):
     return dict(id=f'https://www.ozbargain.com.au/node/{i}',title=title,link=f'https://www.ozbargain.com.au/node/{i}',cats=['Computing'],votes_pos=5,votes_neg=0,comments=0,expiry=None)
 
 class TechTests(unittest.TestCase):
+    def test_rotation_covers_every_store_without_clock_dependence(self):
+        with tempfile.TemporaryDirectory() as tmp, patch.object(ozwatch,'FEED_CURSOR',str(Path(tmp)/'cursor.json')):
+            seen=[]
+            for _ in range(9):seen.extend(ozwatch.rotated_stores())
+            self.assertEqual(seen,ozwatch.STORE_FEEDS)
     def test_laptop_below_fifty_percent_matches(self):
         score,reasons=ozwatch.classify(deal())
         self.assertGreaterEqual(score,40)
@@ -31,7 +36,7 @@ class TechTests(unittest.TestCase):
             history=Path(tmp)/'history.json'
             history.write_text(json.dumps({ozwatch.alert_key('baseline'):ozwatch.time.time()}))
             capture=io.StringIO()
-            with patch.object(ozwatch,'ALERTS_ONLY',True),patch.object(ozwatch,'ALERT_STATE',str(history)),patch.object(ozwatch,'FEEDS',['example']),patch.object(ozwatch,'STORE_FEEDS_PER_RUN',0),patch.object(ozwatch,'fetch',return_value=b'feed'),patch.object(ozwatch,'parse_feed',side_effect=lambda _: [deal()]),patch.object(ozwatch,'push') as push,patch.object(ozwatch,'write_html') as write,patch.object(ozwatch,'save_state') as save,contextlib.redirect_stdout(capture):
+            with patch.object(ozwatch,'ALERTS_ONLY',True),patch.object(ozwatch,'ALERT_STATE',str(history)),patch.object(ozwatch,'FEEDS',['example']),patch.object(ozwatch,'rotated_stores',return_value=[]),patch.object(ozwatch,'fetch',return_value=b'feed'),patch.object(ozwatch,'parse_feed',side_effect=lambda _: [deal()]),patch.object(ozwatch,'push') as push,patch.object(ozwatch,'write_html') as write,patch.object(ozwatch,'save_state') as save,contextlib.redirect_stdout(capture):
                 first=ozwatch.run_once();second=ozwatch.run_once()
             self.assertEqual(first['notifications'],1)
             self.assertEqual(second['notifications'],0)
@@ -43,7 +48,7 @@ class TechTests(unittest.TestCase):
     def test_first_run_silent_and_alert_cap(self):
         with tempfile.TemporaryDirectory() as tmp:
             history=Path(tmp)/'history.json'
-            with patch.object(ozwatch,'ALERTS_ONLY',True),patch.object(ozwatch,'ALERT_STATE',str(history)),patch.object(ozwatch,'FEEDS',['example']),patch.object(ozwatch,'STORE_FEEDS_PER_RUN',0),patch.object(ozwatch,'fetch',return_value=b'feed'),patch.object(ozwatch,'parse_feed',side_effect=lambda _: [deal(i) for i in range(10)]),patch.object(ozwatch,'push') as push,contextlib.redirect_stdout(io.StringIO()):
+            with patch.object(ozwatch,'ALERTS_ONLY',True),patch.object(ozwatch,'ALERT_STATE',str(history)),patch.object(ozwatch,'FEEDS',['example']),patch.object(ozwatch,'rotated_stores',return_value=[]),patch.object(ozwatch,'fetch',return_value=b'feed'),patch.object(ozwatch,'parse_feed',side_effect=lambda _: [deal(i) for i in range(10)]),patch.object(ozwatch,'push') as push,contextlib.redirect_stdout(io.StringIO()):
                 result=ozwatch.run_once()
                 self.assertEqual(result['notifications'],0)
                 self.assertEqual(push.call_count,0)
@@ -53,7 +58,7 @@ class TechTests(unittest.TestCase):
     def test_feed_failure_does_not_overwrite_state(self):
         with tempfile.TemporaryDirectory() as tmp:
             history=Path(tmp)/'history.json';history.write_text('{}')
-            with patch.object(ozwatch,'ALERTS_ONLY',True),patch.object(ozwatch,'ALERT_STATE',str(history)),patch.object(ozwatch,'FEEDS',['example']),patch.object(ozwatch,'STORE_FEEDS_PER_RUN',0),patch.object(ozwatch,'fetch',side_effect=OSError('unavailable')):
+            with patch.object(ozwatch,'ALERTS_ONLY',True),patch.object(ozwatch,'ALERT_STATE',str(history)),patch.object(ozwatch,'FEEDS',['example']),patch.object(ozwatch,'rotated_stores',return_value=[]),patch.object(ozwatch,'fetch',side_effect=OSError('unavailable')):
                 with self.assertRaises(RuntimeError):ozwatch.run_once()
             self.assertEqual(history.read_text(),'{}')
 

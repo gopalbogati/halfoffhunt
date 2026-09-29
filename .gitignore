@@ -11,3 +11,5 @@ BUSINESS-PLAN.md
 private_alert_state.json
 private_alert_state.json.tmp
 state.json.tmp
+feed_cursor.json
+feed_cursor.json.tmp

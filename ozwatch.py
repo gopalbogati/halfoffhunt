@@ -74,6 +74,7 @@ STATE = os.path.join(HERE, "state.json")
 OUT = os.path.join(HERE, "deals.html")
 ALERTS_ONLY = False
 ALERT_STATE = os.path.join(HERE, "private_alert_state.json")
+FEED_CURSOR = os.path.join(HERE, "feed_cursor.json")
 TECH_CONFIG = json.loads(Path(HERE, "tech_watch.json").read_text())
 # ----------------------------------------
 
@@ -287,14 +288,25 @@ def notify(title, body, url):
                    capture_output=True)
 
 
+def rotated_stores():
+    try:
+        cursor = int(json.loads(Path(FEED_CURSOR).read_text()).get("next", 0))
+    except (OSError, ValueError, TypeError, AttributeError):
+        cursor = 0
+    count = min(STORE_FEEDS_PER_RUN, len(STORE_FEEDS))
+    picks = [STORE_FEEDS[(cursor + i) % len(STORE_FEEDS)] for i in range(count)]
+    Path(FEED_CURSOR + ".tmp").write_text(json.dumps({"next": (cursor + count) % len(STORE_FEEDS)}))
+    os.replace(FEED_CURSOR + ".tmp", FEED_CURSOR)
+    return picks
+
+
 def run_once(first_run_silent=False):
     now = datetime.now(timezone.utc).astimezone()
     history = load_alert_history() if ALERTS_ONLY else {}
     state = {} if ALERTS_ONLY else load_state()
     seen_any = bool(history) if ALERTS_ONLY else bool(state)
     found, feeds_ok = 0, 0
-    slot = int(time.time() // 300)
-    picks = [STORE_FEEDS[(slot * STORE_FEEDS_PER_RUN + i) % len(STORE_FEEDS)] for i in range(STORE_FEEDS_PER_RUN)]
+    picks = rotated_stores()
     for url in FEEDS + [f"https://www.ozbargain.com.au/deals/{d}/feed" for d in picks]:
         try:
             items = list(parse_feed(fetch(url)))
