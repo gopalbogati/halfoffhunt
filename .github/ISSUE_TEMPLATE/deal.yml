@@ -1,0 +1,33 @@
+name: Suggest a deal or store
+description: Submit an Australian offer or independent retailer for review
+title: "[Submission] "
+body:
+  - type: markdown
+    attributes:
+      value: "Submissions are public. Do not include personal information or credentials. Listing is subject to review."
+  - type: input
+    id: retailer
+    attributes:
+      label: Retailer name
+    validations:
+      required: true
+  - type: input
+    id: url
+    attributes:
+      label: Direct retailer URL
+    validations:
+      required: true
+  - type: textarea
+    id: details
+    attributes:
+      label: Price, expiry, shipping and restrictions
+      description: Include AUD price, comparison price source, stock, coupon and delivery terms. For store requests, describe the permitted product feed.
+    validations:
+      required: true
+  - type: textarea
+    id: relationship
+    attributes:
+      label: Your relationship to the store
+      description: State whether you own, work for or earn commission from the store, or are an independent shopper.
+    validations:
+      required: true

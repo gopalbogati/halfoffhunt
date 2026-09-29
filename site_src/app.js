@@ -2,8 +2,12 @@
   const $ = (s) => document.querySelector(s);
   const PAGE = 48;
   const CATS = ["Tech", "Shoes", "Fashion", "Home & Kitchen", "Beauty", "Outdoors", "Travel", "Marketplace"];
-  const state = { cat: "all", q: "", store: "", max: "", sort: "mix", shown: PAGE };
+  const state = { cat: "all", q: "", store: "", max: "", sort: "mix", shown: PAGE, saved: false };
   let deals = [];
+  let saved = new Set();
+  try { const ids = JSON.parse(localStorage.getItem("hoh-saved") || "[]"); if (Array.isArray(ids)) saved = new Set(ids.filter(x => typeof x === "string")); } catch {}
+  const safeUrl = (value) => { try { const u = new URL(value); return u.protocol === "https:" ? u.href : ""; } catch { return ""; } };
+
 
   const aud = (n) => "$" + n.toLocaleString("en-AU", { minimumFractionDigits: n % 1 ? 2 : 0, maximumFractionDigits: 2 });
   const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
@@ -28,6 +32,7 @@
   function filtered() {
     const q = state.q.trim().toLowerCase();
     let list = deals.filter((d) =>
+      (!state.saved || saved.has(d.id)) &&
       (state.cat === "all" || (state.cat === "errors" ? d.error : d.cat === state.cat)) &&
       (!state.store || d.store === state.store) &&
       (!state.max || d.price <= +state.max) &&
@@ -55,8 +60,8 @@
 
   function card(d) {
     const fresh = Date.now() / 1000 - d.first_seen < 6 * 3600;
-    return `<a class="card${d.error ? " error" : ""}" href="${esc(d.url)}" target="_blank" rel="noopener sponsored">
-      <div class="ph">${d.img ? `<img src="${esc(d.img)}" alt="" loading="lazy" decoding="async">` : ""}
+    return `<article class="card${d.error ? " error" : ""}"><a class="deal-link" href="${esc(safeUrl(d.url))}" target="_blank" rel="noopener noreferrer${d.affiliate ? " sponsored" : ""}">
+      <div class="ph">${safeUrl(d.img) ? `<img src="${esc(safeUrl(d.img))}" alt="" loading="lazy" decoding="async">` : ""}
         <span class="pct">-${d.pct}%</span>${fresh ? '<span class="new">NEW</span>' : ""}
         ${d.error ? '<span class="flag">Possible error</span>' : ""}</div>
       <div class="info">
@@ -64,19 +69,23 @@
         <div class="title">${esc(d.title)}${d.variant ? ` <span class="meta">(${esc(d.variant)})</span>` : ""}</div>
         <div class="prices"><span class="now">${aud(d.price)}</span><span class="was">${aud(d.was)}</span>
         <span class="save">Save ${aud(Math.round(d.was - d.price))}</span></div>
-      </div></a>`;
+        <p class="small">Retailer’s “was” price · delivery extra unless stated</p>
+        ${d.checked_at ? `<span class="meta">Checked ${ago(d.checked_at * 1000)}</span>` : ""}
+      </div></a><div class="card-actions"><button class="ghost" data-save="${esc(d.id)}" aria-pressed="${saved.has(d.id)}">${saved.has(d.id) ? "♥ Saved" : "♡ Save"}</button><button class="ghost" data-share="${esc(d.id)}">Share</button></div></article>`;
   }
 
   function render() {
     const list = filtered();
     $("#grid").innerHTML = list.length
       ? list.slice(0, state.shown).map(card).join("")
-      : '<div class="empty">No deals match those filters right now. New markdowns land every 30 minutes.</div>';
+      : '<div class="empty">No deals match those filters right now. Try clearing filters or browsing the store directory.</div>';
     $("#more").hidden = list.length <= state.shown;
     $("#result").textContent = `${list.length.toLocaleString()} deal${list.length === 1 ? "" : "s"}` +
       (state.cat !== "all" ? ` in ${state.cat === "errors" ? "possible pricing errors" : state.cat}` : "") +
       (state.q ? ` matching “${state.q}”` : "");
-    document.querySelectorAll(".chip").forEach((c) => c.setAttribute("aria-selected", c.dataset.cat === state.cat));
+    document.querySelectorAll(".chip").forEach((c) => c.setAttribute("aria-pressed", c.dataset.cat === state.cat));
+    $("#saved-toggle").textContent = `Saved (${saved.size})`;
+    $("#saved-toggle").setAttribute("aria-pressed", state.saved);
     syncUrl();
   }
 
@@ -87,7 +96,7 @@
     if (errs) items.push(["errors", "Possible errors", errs]);
     for (const c of CATS) if (count(c)) items.push([c, c, count(c)]);
     $("#cats").innerHTML = items.map(([v, l, n]) =>
-      `<button class="chip${v === "errors" ? " err" : ""}" role="tab" data-cat="${esc(v)}">${esc(l)}<small>${n}</small></button>`).join("");
+      `<button class="chip${v === "errors" ? " err" : ""}" data-cat="${esc(v)}">${esc(l)}<small>${n}</small></button>`).join("");
     $("#cats").onclick = (e) => {
       const b = e.target.closest(".chip"); if (!b) return;
       state.cat = b.dataset.cat; state.shown = PAGE; render();
@@ -95,6 +104,19 @@
   }
 
   function bind() {
+    $("#saved-toggle").onclick = () => { state.saved = !state.saved; state.shown = PAGE; render(); };
+    $("#clear").onclick = () => { Object.assign(state, {cat:"all", q:"", store:"", max:"", sort:"mix", saved:false, shown:PAGE}); for (const k of ["q","store","max","sort"]) $("#"+k).value=state[k]; render(); };
+    $("#grid").onclick = async (e) => {
+      const save = e.target.closest("[data-save]");
+      if (save) { const id = save.dataset.save; saved.has(id) ? saved.delete(id) : saved.add(id); try { localStorage.setItem("hoh-saved", JSON.stringify([...saved])); } catch { $("#notice").textContent = "Saved for this visit only: browser storage is unavailable."; } render(); }
+      const share = e.target.closest("[data-share]");
+      if (share) {
+        const d = deals.find(d => d.id === share.dataset.share);
+        const url = new URL(location.pathname, location.origin); url.searchParams.set("q", d.title); url.searchParams.set("store", d.store);
+        try { if (navigator.share) await navigator.share({title:d.title, url:url.href}); else { await navigator.clipboard.writeText(url.href); share.textContent="Copied!"; } } catch (e) { if (e.name !== "AbortError") $("#notice").textContent = "To share, copy this link: " + url.href; }
+      }
+    };
+
     const q = $("#q"); q.value = state.q;
     let t; q.oninput = () => { clearTimeout(t); t = setTimeout(() => { state.q = q.value; state.shown = PAGE; render(); }, 150); };
     for (const k of ["store", "max", "sort"]) {
@@ -112,8 +134,15 @@
     $("#grid").innerHTML = Array(8).fill('<div class="skeleton"></div>').join("");
     try {
       const r = await fetch("data/deals.json", { cache: "no-store" });
+      if (!r.ok) throw new Error("Unavailable feed");
       const data = await r.json();
-      deals = data.deals;
+      if (!Array.isArray(data.deals)) throw new Error("Invalid feed");
+      deals = data.deals.filter(d => safeUrl(d.url) && Number.isFinite(d.price) && Number.isFinite(d.was));
+      const age = Date.now() - new Date(data.updated).getTime();
+      $("#notice").textContent = age > 2 * 3600000 ? "Updates are delayed. These prices were last checked " + ago(data.updated) + "; verify at checkout." : "Prices in AUD. Discounts use the retailer’s comparison price, not a verified historical low.";
+      const sources = data.sources || [];
+      $("#source-status").textContent = sources.length ? `${sources.filter(s => s.status === "ok").length} of ${sources.length} feeds completed the last scan. Unavailable feeds are not listed as current deals.` : "Feed-level status will appear after the next scan.";
+
       $("#s-count").textContent = data.count.toLocaleString();
       $("#s-stores").textContent = data.stores.length;
       $("#s-best").textContent = deals.length ? "-" + Math.max(...deals.map((d) => d.pct)) + "%" : "–";
@@ -122,7 +151,8 @@
         [...new Set(deals.map((d) => d.store))].sort().map((s) => `<option>${esc(s)}</option>`).join("");
       chips(); bind(); render();
     } catch (e) {
-      $("#grid").innerHTML = '<div class="empty">Deals are loading slowly. Refresh in a moment.</div>';
+      $("#grid").innerHTML = '<div class="empty">The deal feed is unavailable. <button id="retry">Try again</button> or <a href="stores.html">browse stores directly</a>.</div>';
+      $("#retry").onclick = load;
     }
   }
   load();

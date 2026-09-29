@@ -19,7 +19,7 @@ for name in os.listdir(src):
     else:
         shutil.copy(p, out)
 open(os.path.join(out, "robots.txt"), "w").write(f"User-agent: *\nAllow: /\nSitemap: {vals['site_url']}/sitemap.xml\n")
-pages = ["", "about.html", "privacy.html"]
+pages = ["", "about.html", "privacy.html", "stores.html", "submit.html", "terms.html"]
 open(os.path.join(out, "sitemap.xml"), "w").write('<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' +
     "".join(f"<url><loc>{vals['site_url']}/{p}</loc></url>" for p in pages) + "</urlset>")
 open(os.path.join(out, ".nojekyll"), "w").close()

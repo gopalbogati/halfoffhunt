@@ -13,7 +13,8 @@ New big hits (ALERT_PCT%+ or a likely price error) are pushed to:
   python3 stores.py --if-due 25      # only if the last scan was 25+ minutes ago
 Stdlib only.
 """
-import argparse, html, json, os, re, sys, time, urllib.parse, urllib.request
+import argparse, html, json, math, os, re, sys, time, urllib.parse, urllib.request
+from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime, timezone
 
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -58,7 +59,7 @@ def best_variant(p):
             price, was = float(v["price"]), float(v.get("compare_at_price") or 0)
         except (TypeError, ValueError):
             continue
-        if not v.get("available", True) or price <= 0:
+        if v.get("available") is not True or not all(map(math.isfinite, (price, was))) or price <= 0:
             continue
         pct = (1 - price / was) * 100 if was > price else 0
         cands.append((pct, price, was, v))
@@ -74,16 +75,17 @@ def best_variant(p):
 
 def scan_store(s, affs, now):
     cur = store_currency(s["domain"])
-    if cur and cur != "AUD":
+    if cur != "AUD":
         print(f"  - skip {s['name']}: prices in {cur}", file=sys.stderr)
-        return []
+        return [], {"store": s["name"], "status": "unavailable", "reason": "AUD currency not confirmed", "count": 0}
     paths = [f"collections/{c}/products.json" for c in s["collections"]] or ["products.json"]
-    seen, out = set(), []
+    seen, out, failures = set(), [], 0
     for path in paths:
         for page in range(1, MAX_PAGES + 1):
             try:
                 prods = get_json(f"https://{s['domain']}/{path}?limit=250&page={page}").get("products", [])
             except Exception as e:
+                failures += 1
                 print(f"  ! {s['name']} {path} p{page}: {e}", file=sys.stderr)
                 break
             if not prods:
@@ -97,6 +99,8 @@ def scan_store(s, affs, now):
                     continue
                 pct, price, was, v = b
                 url = f"https://{s['domain']}/products/{p['handle']}"
+                if v.get("id"):
+                    url += "?variant=" + str(v["id"])
                 img = (p.get("images") or [{}])[0].get("src", "")
                 if img:
                     img += ("&" if "?" in img else "?") + "width=500"
@@ -106,7 +110,9 @@ def scan_store(s, affs, now):
                     "brand": (p.get("vendor") or "").strip(),
                     "store": s["name"], "domain": s["domain"], "cat": s["cat"],
                     "type": p.get("product_type") or "",
-                    "price": round(price, 2), "was": round(was, 2), "pct": round(pct),
+                    "price": round(price, 2), "was": round(was, 2), "pct": math.floor(pct + 1e-9),
+                    "checked_at": now, "affiliate": affiliate(url, s["domain"], affs) != url,
+                    "original_url": url,
                     "error": pct >= ERROR_PCT and was >= 100 and not s.get("no_error_flag"),
                     "url": affiliate(url, s["domain"], affs), "img": img,
                     "variant": v.get("title") if v.get("title") not in (None, "Default Title") else "",
@@ -115,7 +121,15 @@ def scan_store(s, affs, now):
                 break
             time.sleep(0.4)
     out.sort(key=lambda d: -d["pct"])
-    return out[:PER_STORE_CAP]
+    return out[:PER_STORE_CAP], {"store": s["name"], "status": "partial" if failures else "ok", "count": min(len(out), PER_STORE_CAP), "checked_at": now}
+
+
+def scan_safely(store, affs, now):
+    try:
+        return scan_store(store, affs, now)
+    except Exception as exc:
+        print(f"  ! {store['name']}: {exc}", file=sys.stderr)
+        return [], {"store": store["name"], "status": "unavailable", "reason": "Feed could not be processed", "count": 0}
 
 
 def post(url, data, headers=None):
@@ -136,7 +150,7 @@ def alert(d):
     tok, chat = os.environ.get("TELEGRAM_BOT_TOKEN"), os.environ.get("TELEGRAM_CHAT_ID")
     if tok and chat:
         msg = f"<b>{html.escape(head)}</b>\n{html.escape(body)}\n<a href=\"{html.escape(d['url'])}\">View deal</a>"
-        if CONFIG.get("affiliate_disclosure_in_posts") and d["url"] != f"https://{d['domain']}":
+        if CONFIG.get("affiliate_disclosure_in_posts") and d.get("affiliate", False):
             msg += "\n#ad"
         post(f"https://api.telegram.org/bot{tok}/sendMessage", urllib.parse.urlencode(
             {"chat_id": chat, "text": msg, "parse_mode": "HTML", "disable_web_page_preview": "false"}).encode())
@@ -174,11 +188,17 @@ def main():
     stores = json.load(open(os.path.join(HERE, "stores.json")))["stores"]
     now = time.time()
     deals, ok = [], 0
-    for s in stores:
-        got = scan_store(s, affs, now)
-        ok += bool(got)
-        deals += got
-        print(f"  {s['name']}: {len(got)}")
+    statuses = []
+    with ThreadPoolExecutor(max_workers=6) as pool:
+        results = pool.map(lambda s: scan_safely(s, affs, now), stores)
+        for s, (got, status) in zip(stores, results):
+            statuses.append(status)
+            ok += status["status"] == "ok"
+            deals += got
+            print(f"  {s['name']}: {len(got)} ({status['status']})")
+    # A network-wide failure must not replace the last good publication with empty data.
+    if not any(s["status"] == "ok" for s in statuses):
+        raise RuntimeError("No complete store scans; keeping the last published data")
     fs, al = state["first_seen"], state["alerted"]
     first_run = not fs
     fresh = []
@@ -197,7 +217,7 @@ def main():
     deals.sort(key=lambda d: (-d["error"], -d["pct"]))
     os.makedirs(os.path.join(SITE, "data"), exist_ok=True)
     json.dump({"updated": datetime.now(timezone.utc).isoformat(timespec="seconds"),
-               "stores": sorted({s["name"] for s in stores}), "count": len(deals), "deals": deals},
+               "stores": sorted({s["name"] for s in stores}), "sources": statuses, "count": len(deals), "deals": deals},
               open(os.path.join(SITE, "data", "deals.json"), "w"), separators=(",", ":"))
     write_feed(deals, now)
     json.dump(state, open(STATE, "w"))

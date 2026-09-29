@@ -1,0 +1,17 @@
+name: Report a listing or request removal
+description: Flag an expired, incorrect or unwanted listing
+title: "[Report] "
+body:
+  - type: input
+    id: url
+    attributes:
+      label: Product or store URL
+    validations:
+      required: true
+  - type: textarea
+    id: details
+    attributes:
+      label: What needs correcting or removing?
+      description: This report is public. Do not include private details.
+    validations:
+      required: true
