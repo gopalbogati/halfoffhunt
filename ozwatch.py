@@ -275,7 +275,11 @@ def run_once(first_run_silent=False):
                 print("NEW:", v["reasons"], v["title"])
     save_state(state)
     write_html(state, now)
-    write_public(state, now)
+    # OzBargain content stays private (their terms restrict commercial reuse); remove any old public copy
+    try:
+        os.remove(os.path.join(HERE, "site", "data", "ozb.json"))
+    except FileNotFoundError:
+        pass
     live = [v for v in state.values() if v["score"] and not v["expired"]]
     print(f"[{now:%H:%M:%S}] scanned {found} items, {len(live)} live hits -> {OUT}")
 
@@ -315,20 +319,6 @@ const f=c.dataset.f;document.querySelectorAll('.card').forEach(k=>{k.style.displ
 def ago(ts):
     s = int(time.time() - ts)
     return f"{s//60}m ago" if s < 3600 else f"{s//3600}h ago" if s < 86400 else f"{s//86400}d ago"
-
-
-def write_public(state, now):
-    """Headlines only, linking back to the OzBargain thread (no images, no affiliate links)."""
-    live = [v for v in state.values() if v["score"] and not v["expired"]
-            and (v["votes_pos"] - v["votes_neg"]) >= 5]           # community-checked only
-    live.sort(key=lambda v: -v["score"])
-    out = [{"title": v["title"], "link": v["link"], "votes": v["votes_pos"] - v["votes_neg"],
-            "comments": v["comments"], "tags": [r for r in v["reasons"] if not r.startswith("watch")][:3],
-            "expiry": v.get("expiry"), "seen": v["seen"]} for v in live[:40]]
-    d = os.path.join(HERE, "site", "data")
-    os.makedirs(d, exist_ok=True)
-    with open(os.path.join(d, "ozb.json"), "w") as f:
-        json.dump({"updated": now.isoformat(timespec="seconds"), "items": out}, f, separators=(",", ":"))
 
 
 def write_html(state, now):
