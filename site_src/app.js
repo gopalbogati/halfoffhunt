@@ -131,7 +131,7 @@
   }
 
   async function load() {
-    $("#grid").innerHTML = Array(8).fill('<div class="skeleton"></div>').join("");
+    if (!$("#grid").children.length) $("#grid").innerHTML = Array(8).fill('<div class="skeleton"></div>').join("");
     try {
       const r = await fetch("data/deals.json", { cache: "no-store" });
       if (!r.ok) throw new Error("Unavailable feed");
