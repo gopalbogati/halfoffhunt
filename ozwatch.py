@@ -28,6 +28,15 @@ FEEDS = [
     "https://www.ozbargain.com.au/cat/dining-takeaway/feed?page=1",
     "https://www.ozbargain.com.au/cat/groceries/feed",
 ]
+# Per-store OzBargain feeds for big stores: rotated, STORE_FEEDS_PER_RUN at a time, to stay polite
+STORE_FEEDS = ["amazon.com.au", "jbhifi.com.au", "kmart.com.au", "bigw.com.au", "officeworks.com.au",
+    "thegoodguys.com.au", "harveynorman.com.au", "ebay.com.au", "myer.com.au", "davidjones.com",
+    "theiconic.com.au", "coles.com.au", "woolworths.com.au", "bunnings.com.au", "target.com.au",
+    "costco.com.au", "aldi.com.au", "apple.com", "samsung.com", "dell.com", "lenovo.com",
+    "chemistwarehouse.com.au", "priceline.com.au", "rebelsport.com.au", "dyson.com.au",
+    "appliancesonline.com.au", "mwave.com.au", "scorptec.com.au", "pccasegear.com", "umart.com.au",
+    "binglee.com.au", "kogan.com"]
+STORE_FEEDS_PER_RUN = 4
 ERROR_WORDS = re.compile(
     r"price[\s-]*error|pricing[\s-]*(error|mistake|glitch)|price[\s-]*mistake|glitch|"
     r"mispric|wrong price|error price|pricing bug|\bbug\b|too good|probably (an )?error|"
@@ -36,7 +45,8 @@ STRONG_ERROR = re.compile(r"price[\s-]*error|pricing[\s-]*(error|mistake|glitch)
 MIN_DISCOUNT_PCT = 60          # flag anything at least this % off (when Was/RRP is stated)
 CHEAP_UNDER = 5.0              # flag any priced item at or under this ($)
 MIN_VOTES_FOR_DISCOUNT = 0     # net votes needed for pure-discount hits (errors always shown)
-BIG_STORES = ["Amazon AU", "JB Hi-Fi", "Kmart", "Big W", "BIG W", "Officeworks", "The Good Guys", "Harvey Norman",
+BIG_STORES = ["Samsung", "Apple", "Dell", "Lenovo", "Chemist Warehouse", "Priceline", "rebel", "Dyson",
+              "Appliances Online", "Mwave", "Scorptec", "PCCaseGear", "Umart", "Bing Lee", "Kogan", "Amazon AU", "JB Hi-Fi", "Kmart", "Big W", "BIG W", "Officeworks", "The Good Guys", "Harvey Norman",
               "Myer", "David Jones", "THE ICONIC", "The Iconic", "eBay", "Coles", "Woolworths", "Bunnings", "Target", "Costco", "Aldi", "ALDI"]
 WATCH_KEYWORDS = []            # e.g. ["laptop", "rtx", "lego", "dyson"] - always flag these
 FOOD_MODE = True               # food & drink alerts, filtered to MY_STATE
@@ -242,7 +252,9 @@ def run_once(first_run_silent=False):
     state = load_state()
     seen_any = bool(state)
     found = 0
-    for url in FEEDS:
+    slot = int(time.time() // 300)
+    picks = [STORE_FEEDS[(slot * STORE_FEEDS_PER_RUN + i) % len(STORE_FEEDS)] for i in range(STORE_FEEDS_PER_RUN)]
+    for url in FEEDS + [f"https://www.ozbargain.com.au/deals/{d}/feed" for d in picks]:
         try:
             for d in parse_feed(fetch(url)):
                 if not d["id"]:
