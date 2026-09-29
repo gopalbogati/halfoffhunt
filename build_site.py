@@ -46,5 +46,17 @@ if CLEAN:
         t2 = re.sub(r'((?:rel="canonical" href|property="og:url" content)="[^"]*?)\.html"', r'\1"', t)
         if t2 != t:
             open(f, "w").write(t2)
+# Cloudflare Web Analytics (cookieless). The token is public by design; it only identifies the site.
+token = cfg.get("cf_analytics_token", "")
+if token:
+    import glob, re as _re
+    beacon = ("<script defer src=\"https://static.cloudflareinsights.com/beacon.min.js\" "
+              f"data-cf-beacon='{{\"token\": \"{token}\"}}'></script>")
+    if not _re.fullmatch(r"[0-9a-f]{32}", token):
+        raise SystemExit("cf_analytics_token must be 32 hex characters")
+    for f in glob.glob(os.path.join(out, "**", "*.html"), recursive=True):
+        t = open(f).read()
+        if "cloudflareinsights" not in t and "</body>" in t:
+            open(f, "w").write(t.replace("</body>", beacon + "</body>", 1))
 open(os.path.join(out, ".nojekyll"), "w").close()
 print("site built ->", out)
