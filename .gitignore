@@ -1,0 +1,9 @@
+state.json
+stores_state.json
+deals.html
+site/
+.scanned
+*.log
+.DS_Store
+__pycache__/
+BUSINESS-PLAN.md

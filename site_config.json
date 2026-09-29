@@ -1,0 +1,10 @@
+{
+  "brand": "Half Off Hunt",
+  "tagline": "Australia's biggest markdowns, checked every 30 minutes. Only 50%+ off, only in stock.",
+  "site_url": "https://gopalbogati.github.io/halfoffhunt",
+  "min_pct": 50,
+  "alert_pct": 80,
+  "public_ntfy_topic": "halfoffhunt-au",
+  "telegram_url": "",
+  "affiliate_disclosure_in_posts": true
+}

@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="en-AU">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>{{brand}} · 50%+ off deals across Australian stores</title>
+<meta name="description" content="{{tagline}}">
+<link rel="canonical" href="{{site_url}}/">
+<meta property="og:title" content="{{brand}}: Australia's biggest markdowns">
+<meta property="og:description" content="{{tagline}}">
+<meta property="og:type" content="website">
+<meta property="og:url" content="{{site_url}}/">
+<meta name="theme-color" content="#0f1115">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="alternate" type="application/rss+xml" title="{{brand}} deals" href="feed.xml">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="top">
+  <div class="wrap nav">
+    <a class="logo" href="./"><span class="mark">½</span>{{brand}}</a>
+    <nav><a href="#alerts">Get alerts</a><a href="about.html">How it works</a></nav>
+  </div>
+  <div class="wrap hero">
+    <p class="eyebrow">Live · Australian stores · AUD</p>
+    <h1>Half price or better.<br><span>Nothing else makes the list.</span></h1>
+    <p class="lede">{{tagline}}</p>
+    <div class="stats">
+      <div><b id="s-count">–</b><span>deals live</span></div>
+      <div><b id="s-stores">–</b><span>stores watched</span></div>
+      <div><b id="s-best">–</b><span>biggest markdown</span></div>
+      <div><b id="s-updated">–</b><span>last checked</span></div>
+    </div>
+  </div>
+</header>
+
+<div class="toolbar" id="toolbar">
+  <div class="wrap">
+    <div class="chips" id="cats" role="tablist" aria-label="Category"></div>
+    <div class="controls">
+      <input id="q" type="search" placeholder="Search brand, product, store…" aria-label="Search deals">
+      <select id="store" aria-label="Store"><option value="">All stores</option></select>
+      <select id="max" aria-label="Maximum price">
+        <option value="">Any price</option><option value="20">Under $20</option><option value="50">Under $50</option>
+        <option value="100">Under $100</option><option value="250">Under $250</option></select>
+      <select id="sort" aria-label="Sort">
+        <option value="mix">Top picks</option><option value="pct">Biggest % off</option><option value="save">Biggest $ saving</option>
+        <option value="new">Newest first</option><option value="low">Lowest price</option></select>
+    </div>
+  </div>
+</div>
+
+<main class="wrap">
+  <p class="result" id="result" aria-live="polite"></p>
+  <div class="grid" id="grid"></div>
+  <div class="more"><button id="more" hidden>Show more deals</button></div>
+</main>
+
+<section class="alerts wrap" id="alerts">
+  <div>
+    <h2>Hear about it first</h2>
+    <p>The best markdowns sell out in hours. Get a push the moment something hits 80% off or looks like a pricing error.</p>
+  </div>
+  <div class="ways">
+    <div class="way">
+      <h3>Phone alerts</h3>
+      <p>Install the free <b>ntfy</b> app (iPhone or Android), tap +, and subscribe to:</p>
+      <code id="topic">{{ntfy}}</code>
+      <button class="ghost" data-copy="{{ntfy}}">Copy topic</button>
+    </div>
+    <div class="way" id="tg-way" data-tg="{{telegram_url}}">
+      <h3>Telegram channel</h3>
+      <p>Same alerts, in a channel you can mute or share.</p>
+      <a class="btn" id="tg-link" href="{{telegram_url}}">Join on Telegram</a>
+    </div>
+    <div class="way">
+      <h3>RSS feed</h3>
+      <p>For feed readers and automations. The 100 newest deals.</p>
+      <a class="btn ghost" href="feed.xml">Open RSS feed</a>
+    </div>
+  </div>
+</section>
+
+<footer class="foot">
+  <div class="wrap">
+    <p><b>{{brand}}</b> is an independent Australian deal index. We are not affiliated with the retailers listed. Prices come from each store's public product data and can change or sell out at any time; the store's checkout price is final.</p>
+    <p><b>Disclosure:</b> some links may be affiliate links, meaning we may earn a commission if you buy, at no extra cost to you. It never changes which deals are listed or their order. <a href="about.html#disclosure">Read more</a> · <a href="privacy.html">Privacy</a></p>
+    <p class="small">"Possible pricing error" means the discount is unusually large. Retailers may cancel orders placed at an obvious pricing error, so don't buy anything you'd be upset to have cancelled.</p>
+  </div>
+</footer>
+<script src="app.js" defer></script>
+</body>
+</html>

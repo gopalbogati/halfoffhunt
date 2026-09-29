@@ -1,0 +1,44 @@
+{
+  "_note": "Australian retailers whose public Shopify product feed carries was/now prices. collections = sale sections to scan; [] = scan the whole catalogue (first pages).",
+  "stores": [
+    {"name": "Ted's Cameras", "domain": "www.teds.com.au", "cat": "Tech", "collections": ["clearance"]},
+    {"name": "Addicted to Audio", "domain": "www.addictedtoaudio.com.au", "cat": "Tech", "collections": ["sale"]},
+    {"name": "EcoFlow AU", "domain": "au.ecoflow.com", "cat": "Tech", "collections": []},
+    {"name": "Keychron AU", "domain": "www.keychron.com.au", "cat": "Tech", "collections": []},
+
+    {"name": "Wittner", "domain": "www.wittner.com.au", "cat": "Shoes", "collections": ["sale"]},
+    {"name": "Betts", "domain": "www.betts.com.au", "cat": "Shoes", "collections": ["60-70-off-sale", "womens-sale"]},
+    {"name": "Up There Athletics", "domain": "www.upthereathletics.com", "cat": "Shoes", "collections": ["sale"]},
+    {"name": "Billini", "domain": "www.billini.com", "cat": "Shoes", "collections": ["sale"]},
+    {"name": "Steve Madden AU", "domain": "www.stevemadden.com.au", "cat": "Shoes", "collections": []},
+    {"name": "Tony Bianco", "domain": "www.tonybianco.com", "cat": "Shoes", "collections": []},
+    {"name": "Laced", "domain": "www.laced.com.au", "cat": "Shoes", "collections": ["sale-footwear"]},
+    {"name": "UGG Express", "domain": "www.uggexpress.com.au", "cat": "Shoes", "collections": []},
+
+    {"name": "Culture Kings", "domain": "www.culturekings.com.au", "cat": "Fashion", "collections": ["outlet"]},
+    {"name": "Universal Store", "domain": "www.universalstore.com", "cat": "Fashion", "collections": ["sale"]},
+    {"name": "General Pants", "domain": "www.generalpants.com.au", "cat": "Fashion", "collections": ["sale"]},
+    {"name": "SurfStitch", "domain": "www.surfstitch.com", "cat": "Fashion", "collections": ["sale"]},
+    {"name": "Billabong AU", "domain": "www.billabong.com.au", "cat": "Fashion", "collections": ["sale"]},
+    {"name": "Quiksilver AU", "domain": "www.quiksilver.com.au", "cat": "Fashion", "collections": ["sale"]},
+    {"name": "Meshki", "domain": "www.meshki.com.au", "cat": "Fashion", "collections": ["sale"]},
+    {"name": "Peppermayo", "domain": "www.peppermayo.com", "cat": "Fashion", "collections": ["sale"]},
+    {"name": "White Fox", "domain": "www.whitefoxboutique.com.au", "cat": "Fashion", "collections": ["sale"]},
+    {"name": "Tiger Mist", "domain": "www.tigermist.com.au", "cat": "Fashion", "collections": ["all-sale"]},
+    {"name": "LSKD", "domain": "www.lskd.co", "cat": "Fashion", "collections": ["further-markdowns"]},
+    {"name": "Lovisa", "domain": "www.lovisa.com.au", "cat": "Fashion", "collections": ["sale"]},
+    {"name": "Mimco", "domain": "www.mimco.com.au", "cat": "Fashion", "collections": ["sale"]},
+
+    {"name": "Ninja Kitchen AU", "domain": "www.ninjakitchen.com.au", "cat": "Home & Kitchen", "collections": ["sale"]},
+    {"name": "Shark AU", "domain": "www.sharkninja.com.au", "cat": "Home & Kitchen", "collections": ["sale"]},
+    {"name": "Mocka", "domain": "www.mocka.com.au", "cat": "Home & Kitchen", "collections": ["furniture-sale"]},
+    {"name": "Hydro Flask AU", "domain": "www.hydroflask.com.au", "cat": "Home & Kitchen", "collections": ["sale"]},
+    {"name": "Antler", "domain": "www.antler.com.au", "cat": "Travel", "collections": ["sale"]},
+
+    {"name": "Lookfantastic AU", "domain": "www.lookfantastic.com.au", "cat": "Beauty", "collections": ["sale"]},
+
+    {"name": "Kathmandu", "domain": "www.kathmandu.com.au", "cat": "Outdoors", "collections": ["49-styles-clearance-further-markdowns", "99-styles-clearance-further-markdowns"]},
+
+    {"name": "OzSale", "domain": "www.ozsale.com.au", "cat": "Marketplace", "collections": [], "no_error_flag": true, "_why": "marketplace RRPs are often inflated"}
+  ]
+}
