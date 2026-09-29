@@ -11,7 +11,8 @@ and pops a macOS notification for each new hit.
 
 Stdlib only. Tweak the CONFIG block below.
 """
-import argparse, html, json, os, re, subprocess, sys, threading, time
+import argparse, hashlib, html, json, os, re, subprocess, sys, threading, time
+from pathlib import Path
 import urllib.request
 import xml.etree.ElementTree as ET
 from datetime import datetime, timezone
@@ -27,6 +28,8 @@ FEEDS = [
     "https://www.ozbargain.com.au/cat/dining-takeaway/feed",
     "https://www.ozbargain.com.au/cat/dining-takeaway/feed?page=1",
     "https://www.ozbargain.com.au/cat/groceries/feed",
+    "https://www.ozbargain.com.au/cat/computing/feed",
+    "https://www.ozbargain.com.au/cat/gaming/feed",
 ]
 # Per-store OzBargain feeds for big stores: rotated, STORE_FEEDS_PER_RUN at a time, to stay polite
 STORE_FEEDS = ["amazon.com.au", "jbhifi.com.au", "kmart.com.au", "bigw.com.au", "officeworks.com.au",
@@ -35,7 +38,7 @@ STORE_FEEDS = ["amazon.com.au", "jbhifi.com.au", "kmart.com.au", "bigw.com.au", 
     "costco.com.au", "aldi.com.au", "apple.com", "samsung.com", "dell.com", "lenovo.com",
     "chemistwarehouse.com.au", "priceline.com.au", "rebelsport.com.au", "dyson.com.au",
     "appliancesonline.com.au", "mwave.com.au", "scorptec.com.au", "pccasegear.com", "umart.com.au",
-    "binglee.com.au", "kogan.com"]
+    "binglee.com.au", "kogan.com", "hp.com", "ebgames.com.au", "centrecom.com.au", "ple.com.au"]
 STORE_FEEDS_PER_RUN = 4
 ERROR_WORDS = re.compile(
     r"price[\s-]*error|pricing[\s-]*(error|mistake|glitch)|price[\s-]*mistake|glitch|"
@@ -69,6 +72,9 @@ NTFY_MIN_SCORE = 40            # only push the good stuff (errors, 40%+ off...);
 HERE = os.path.dirname(os.path.abspath(__file__))
 STATE = os.path.join(HERE, "state.json")
 OUT = os.path.join(HERE, "deals.html")
+ALERTS_ONLY = False
+ALERT_STATE = os.path.join(HERE, "private_alert_state.json")
+TECH_CONFIG = json.loads(Path(HERE, "tech_watch.json").read_text())
 # ----------------------------------------
 
 NS = {"ozb": "https://www.ozbargain.com.au", "media": "http://search.yahoo.com/mrss/"}
@@ -132,7 +138,10 @@ def is_expired(d, now):
         return True
     if d.get("expiry"):
         try:
-            if datetime.fromisoformat(d["expiry"]) < now:
+            expiry = datetime.fromisoformat(d["expiry"])
+            if expiry.tzinfo is None:
+                expiry = expiry.replace(tzinfo=timezone.utc)
+            if expiry < now:
                 return True
         except ValueError:
             pass
@@ -164,6 +173,34 @@ def food_score(d, price, was, pct):
     if sc:
         rs.insert(0, "FOOD")
     return sc, rs
+
+
+def tech_matches(title, price, votes):
+    """Personal interests, not a claim of historical-low pricing or verified value."""
+    if price is None or votes < TECH_CONFIG.get("minimum_votes", 3):
+        return []
+    matches = []
+    for rule in TECH_CONFIG["rules"]:
+        if (price >= rule.get("minimum_price", 0)
+                and re.search(rule["pattern"], title, re.I)
+                and not (rule.get("exclude") and re.search(rule["exclude"], title, re.I))):
+            matches.append(rule["name"])
+    # An expensive console is classified once, not also as an accessory.
+    if "PS5 consoles" in matches and "Gaming accessories" in matches:
+        matches.remove("Gaming accessories")
+    return matches
+
+
+def alert_key(deal_id):
+    return hashlib.sha256(deal_id.encode()).hexdigest()
+
+
+def load_alert_history():
+    try:
+        data = json.loads(Path(ALERT_STATE).read_text())
+        return {k:v for k,v in data.items() if isinstance(k,str) and len(k)==64 and isinstance(v,(int,float))}
+    except (OSError, ValueError, AttributeError):
+        return {}
 
 
 def classify(d):
@@ -199,6 +236,9 @@ def classify(d):
     store = re.search(r"@\s*([^@]+)$", t)
     if store and reasons and any(b.lower() in store.group(1).lower() for b in BIG_STORES):
         reasons.append("big store"); score += 20
+    for category in tech_matches(t, price, d["votes_pos"] - d["votes_neg"]):
+        reasons.append("Tech: " + category)
+        score += 40
     for k in WATCH_KEYWORDS:
         if k.lower() in t.lower():
             reasons.append(f"watch: {k}"); score += 40
@@ -249,25 +289,30 @@ def notify(title, body, url):
 
 def run_once(first_run_silent=False):
     now = datetime.now(timezone.utc).astimezone()
-    state = load_state()
-    seen_any = bool(state)
-    found = 0
+    history = load_alert_history() if ALERTS_ONLY else {}
+    state = {} if ALERTS_ONLY else load_state()
+    seen_any = bool(history) if ALERTS_ONLY else bool(state)
+    found, feeds_ok = 0, 0
     slot = int(time.time() // 300)
     picks = [STORE_FEEDS[(slot * STORE_FEEDS_PER_RUN + i) % len(STORE_FEEDS)] for i in range(STORE_FEEDS_PER_RUN)]
     for url in FEEDS + [f"https://www.ozbargain.com.au/deals/{d}/feed" for d in picks]:
         try:
-            for d in parse_feed(fetch(url)):
+            items = list(parse_feed(fetch(url)))
+            feeds_ok += 1
+            for d in items:
                 if not d["id"]:
                     continue
                 old = state.get(d["id"])
                 d["seen"] = old["seen"] if old else time.time()
                 d["expired"] = is_expired(d, now)
                 d["score"], d["reasons"] = classify(d)
-                d["notified"] = old.get("notified", False) if old else False
+                d["notified"] = alert_key(d["id"]) in history if ALERTS_ONLY else (old.get("notified", False) if old else False)
                 state[d["id"]] = d
                 found += 1
         except Exception as e:
             print(f"  ! {url}: {e}", file=sys.stderr)
+    if not feeds_ok:
+        raise RuntimeError("No RSS feeds could be read; keeping previous state and sending no new alerts")
     # refresh expiry against clock, prune
     cutoff = time.time() - KEEP_DAYS * 86400
     for k in list(state):
@@ -276,24 +321,36 @@ def run_once(first_run_silent=False):
             del state[k]; continue
         v["expired"] = is_expired(v, now)
     # notify new live hits
-    for v in state.values():
+    sent = 0
+    for v in sorted(state.values(), key=lambda v: -v["score"]):
         if v["score"] and not v["expired"] and not v["notified"]:
+            if seen_any and sent >= TECH_CONFIG.get("max_alerts_per_run", 6):
+                continue
             v["notified"] = True
+            history[alert_key(v["id"])] = time.time()
             if seen_any:  # don't spam on very first run
                 notify("OzBargain: " + ", ".join(v["reasons"][:2]), v["title"], v["link"])
                 if v["score"] >= NTFY_MIN_SCORE:
                     push("OzBargain: " + ", ".join(v["reasons"][:2]), v["title"], v["link"],
                          any("ERROR" in r for r in v["reasons"]))
-                print("NEW:", v["reasons"], v["title"])
-    save_state(state)
-    write_html(state, now)
+                sent += 1
+                if not ALERTS_ONLY:
+                    print("NEW:", v["reasons"], v["title"])
+    if ALERTS_ONLY:
+        history = {k:v for k,v in history.items() if time.time() - v < 14 * 86400}
+        Path(ALERT_STATE + ".tmp").write_text(json.dumps(history))
+        os.replace(ALERT_STATE + ".tmp", ALERT_STATE)
+    else:
+        save_state(state)
+        write_html(state, now)
     # OzBargain content stays private (their terms restrict commercial reuse); remove any old public copy
     try:
         os.remove(os.path.join(HERE, "site", "data", "ozb.json"))
     except FileNotFoundError:
         pass
     live = [v for v in state.values() if v["score"] and not v["expired"]]
-    print(f"[{now:%H:%M:%S}] scanned {found} items, {len(live)} live hits -> {OUT}")
+    print(f"[{now:%H:%M:%S}] {feeds_ok}/{len(FEEDS) + len(picks)} feeds read; {found} items; {len(live)} matches; {sent} new notifications considered")
+    return {"feeds_ok": feeds_ok, "items": found, "matches": len(live), "notifications": sent}
 
 
 CSS = """
@@ -344,6 +401,7 @@ def write_html(state, now):
         if any("off" in r for r in v["reasons"]): kinds.append("deep")
         if any("under" in r for r in v["reasons"]): kinds.append("cheap")
         if any("watch" in r for r in v["reasons"]): kinds.append("watch")
+        if any(r.startswith("Tech:") for r in v["reasons"]): kinds.append("tech")
         if "FOOD" in v["reasons"]: kinds.append("food")
         tags = "".join(
             f'<span class="tag {"e" if "ERROR" in r else "d" if ("off" in r or "FREE" in r or r == "FOOD") else ""}">{html.escape(r)}</span>'
@@ -370,7 +428,7 @@ def write_html(state, now):
 <div class="sub">{len(hits)} live, non-expired hits · updated {now:%a %H:%M:%S} · page refreshes every 60s · ALWAYS read the comments: errors get cancelled and "expired" flags lag</div></header>
 <div class="bar"><button class="chip on" data-f="all">All</button><button class="chip" data-f="error">Price errors</button>
 <button class="chip" data-f="free">Free</button><button class="chip" data-f="deep">{MIN_DISCOUNT_PCT}%+ off</button>
-<button class="chip" data-f="cheap">Under ${CHEAP_UNDER:g}</button><button class="chip" data-f="food">🍔 Food ({MY_STATE})</button><button class="chip" data-f="watch">My keywords</button></div>
+<button class="chip" data-f="cheap">Under ${CHEAP_UNDER:g}</button><button class="chip" data-f="food">🍔 Food ({MY_STATE})</button><button class="chip" data-f="watch">My keywords</button><button class="chip" data-f="tech">Laptops, PS5 &amp; tech</button></div>
 <main>{body}</main><script>{JS}</script></body></html>'''
     with open(OUT, "w") as f:
         f.write(page)
@@ -380,23 +438,31 @@ def serve(port):
     os.chdir(HERE)
     class H(SimpleHTTPRequestHandler):
         def do_GET(self):
-            if self.path in ("/", ""):
-                self.path = "/deals.html"
+            if self.path not in ("/", "/deals.html"):
+                self.send_error(404)
+                return
+            self.path = "/deals.html"
             return super().do_GET()
+        def do_HEAD(self):
+            self.send_error(405)
         def log_message(self, *a): pass
     ThreadingHTTPServer(("127.0.0.1", port), H).serve_forever()
 
 
 if __name__ == "__main__":
     ap = argparse.ArgumentParser()
+    ap.add_argument("--alerts-only", action="store_true", help="send personal notifications without saving RSS content or a dashboard")
     ap.add_argument("--loop", type=int, default=0, help="poll interval seconds (0 = once)")
     ap.add_argument("--serve", action="store_true", help="serve dashboard on localhost:8765")
     ap.add_argument("--port", type=int, default=8765)
     a = ap.parse_args()
+    ALERTS_ONLY = a.alerts_only
+    if a.serve and a.alerts_only:
+        ap.error("--serve needs local dashboard mode; omit --alerts-only")
     if a.serve:
         threading.Thread(target=serve, args=(a.port,), daemon=True).start()
         print(f"Dashboard: http://localhost:{a.port}")
     run_once()
     while a.loop:
-        time.sleep(max(a.loop, 30))
+        time.sleep(max(a.loop, 300))
         run_once()

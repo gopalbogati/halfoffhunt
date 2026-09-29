@@ -1,0 +1,30 @@
+{
+  "minimum_votes": 3,
+  "max_alerts_per_run": 6,
+  "rules": [
+    {
+      "name": "Laptops",
+      "pattern": "\\b(laptops?|notebooks?|macbook|thinkpad|ideapad|vivobook|zenbook|omnibook|chromebook|legion [579]|yoga slim)\\b",
+      "exclude": "\\b(sleeve|stand|bag|case|charger|dock|screen protector)\\b",
+      "minimum_price": 200
+    },
+    {
+      "name": "PS5 consoles",
+      "pattern": "(?=.*\\b(ps5|playstation\\s*5)\\b)(?=.*\\b(console|slim|pro|digital|disc)\\b)",
+      "exclude": "\\b(controller|dualsense|headset|cover|stand|charging|skin|disc drive)\\b",
+      "minimum_price": 250
+    },
+    {
+      "name": "Gaming accessories",
+      "pattern": "\\b(dualsense|ps5|playstation\\s*5|xbox|nintendo switch|steam deck|rog ally)\\b",
+      "exclude": "",
+      "minimum_price": 10
+    },
+    {
+      "name": "PC parts & monitors",
+      "pattern": "\\b(rtx\\s*\\d{4}|rx\\s*\\d{4}|ryzen|core ultra|ssd|nvme|ddr[45]|monitor)\\b",
+      "exclude": "\\b(cable|adapter|mount|stand)\\b",
+      "minimum_price": 30
+    }
+  ]
+}

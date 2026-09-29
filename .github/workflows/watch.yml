@@ -26,15 +26,15 @@ jobs:
         uses: actions/cache/restore@v4
         with:
           path: |
-            state.json
+            private_alert_state.json
             stores_state.json
             site/data
             site/feed.xml
-          key: state-none
-          restore-keys: state-
-      - name: OzBargain private alerts (price errors, cheap, Sydney food)
+          key: state-v2-none
+          restore-keys: state-v2-
+      - name: Personal RSS alerts (tech, price errors and Sydney food)
         continue-on-error: true
-        run: python3 ozwatch.py
+        run: python3 ozwatch.py --alerts-only
         env:
           NTFY_TOPIC: ${{ secrets.NTFY_TOPIC }}
       - name: Retailer sale scan (every 30 min)
@@ -48,11 +48,11 @@ jobs:
         uses: actions/cache/save@v4
         with:
           path: |
-            state.json
+            private_alert_state.json
             stores_state.json
             site/data
             site/feed.xml
-          key: state-${{ github.run_id }}
+          key: state-v2-${{ github.run_id }}
       - name: Check if site needs publishing
         id: due
         run: |

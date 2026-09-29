@@ -7,3 +7,7 @@ site/
 .DS_Store
 __pycache__/
 BUSINESS-PLAN.md
+
+private_alert_state.json
+private_alert_state.json.tmp
+state.json.tmp

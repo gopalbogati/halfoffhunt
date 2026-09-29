@@ -68,3 +68,29 @@ A live scanner run requires retailer network access. It can send alerts when ale
 5. Social launch: share the live link manually. No social account connection or automatic LinkedIn posting is configured.
 
 Saved deals are local product IDs, not price alerts or price history. The site does not claim historical lows, complete retailer coverage, or guaranteed stock.
+
+## Tech discovery and personal alerts
+
+Public `tech.html` now groups 15 official retailer links into laptops, PS5/gaming, PC parts and tech. These links are not a live Amazon/retailer price feed and are not subject to the home page's 50% filter. `tech_sources.json` records the sources researched on 29 September 2026. No price API credentials or paid data service is required for these links.
+
+`site_src/tech-feeds.opml` contains 17 personal RSS subscriptions: 15 store feeds plus Computing and Gaming. Import it into your RSS reader. Store RSS routes follow OzBargain's documented `/deals/<domain>/feed` pattern; a store with no posts or unavailable RSS may not return data. This is community coverage, not complete retailer inventory.
+
+For a local dashboard:
+
+```sh
+python3 ozwatch.py --loop 900 --serve
+# then open http://127.0.0.1:8765 on the same computer
+```
+
+Mac shortcut: `bash start-private-tech.command`. Stop with Control+C. Your computer must remain awake. No package installation is needed beyond Python 3. The local server serves only the generated dashboard, not repository files. `state.json` and `deals.html` remain ignored by git.
+
+`tech_watch.json` configures laptop, PS5 console, gaming accessory and PC-component matching. Three net votes are required for tech matches; there is no 50% discount requirement. This identifies candidates, not verified good prices. Specific models, membership, shipping, trade-ins, refurbished stock and eligibility still require checking. The existing food and price-error rules remain available. General, computing and gaming feeds run each pass; 4 of the 36 retailer feeds rotate each run (about 45 minutes per retailer at a five-minute schedule, longer if Actions is delayed). RSS calls that fail are not bypassed.
+
+GitHub uses `ozwatch.py --alerts-only`: only SHA-256 deal-ID notification fingerprints and timestamps are cached in `private_alert_state.json`; full RSS items, titles and the local dashboard are not cached, logged as new-deal content or uploaded to Pages. Cache prefix `state-v2-` stops restoring legacy caches containing raw private-watcher items. Previously created cache/log objects are not deleted by this change. The first run in the new mode silently establishes a baseline. Future runs select at most six new notifications. `NTFY_TOPIC` is the existing personal channel; no OzBargain content goes to the site's public topic. An unprotected ntfy topic is not an authenticated inbox; do not put sensitive information in it.
+
+### Source access findings
+
+- Amazon AU: official Associates policies require approved API-based price/availability integration; no anonymous free product-price API was identified. Direct official deal links are implemented. No Amazon scraping or fabricated prices.
+- OzBargain: published RSS routes support personal feed discovery. Terms: https://www.ozbargain.com.au/wiki/help:terms . Store feed description: https://blog.ozbargain.com.au/2008/full-feed-for-your-stor/ . No commercial republication is enabled and private mode is not a permissions workaround.
+- Other retailers: official sales/catalogue/coupon links are recorded in `tech_sources.json`. Direct feed/API republication rights have not been established, so no new retailer inventory scraper is enabled.
+- The local research runtime received HTTP 403 from tested OzBargain RSS requests. Feed operation is therefore verified separately on the existing Actions runner; if blocked there too, the watcher reports failure rather than claiming current data.

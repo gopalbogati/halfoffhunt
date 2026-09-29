@@ -1,0 +1,192 @@
+{
+  "checked_on": "2026-09-29",
+  "note": "Official discovery links, not live price data or a claim of API/republication permission.",
+  "stores": [
+    {
+      "name": "Amazon AU",
+      "domain": "amazon.com.au",
+      "url": "https://www.amazon.com.au/events/deals",
+      "categories": [
+        "Laptops",
+        "PS5 & gaming",
+        "PC parts",
+        "Tech"
+      ],
+      "note": "Browse Amazon deals; check seller, delivery and Prime requirements.",
+      "mode": "direct_link",
+      "private_feed": "https://www.ozbargain.com.au/deals/amazon.com.au/feed"
+    },
+    {
+      "name": "JB Hi-Fi",
+      "domain": "jbhifi.com.au",
+      "url": "https://www.jbhifi.com.au/collections/hot-deals",
+      "categories": [
+        "Laptops",
+        "PS5 & gaming",
+        "Tech"
+      ],
+      "note": "Compare the exact console bundle or laptop configuration.",
+      "mode": "direct_link",
+      "private_feed": "https://www.ozbargain.com.au/deals/jbhifi.com.au/feed"
+    },
+    {
+      "name": "Officeworks",
+      "domain": "officeworks.com.au",
+      "url": "https://www.officeworks.com.au/shop/officeworks/c/clearance",
+      "categories": [
+        "Laptops",
+        "Tech"
+      ],
+      "note": "Clearance stock may depend on your postcode or store.",
+      "mode": "direct_link",
+      "private_feed": "https://www.ozbargain.com.au/deals/officeworks.com.au/feed"
+    },
+    {
+      "name": "The Good Guys",
+      "domain": "thegoodguys.com.au",
+      "url": "https://www.thegoodguys.com.au/deals/laptops",
+      "categories": [
+        "Laptops",
+        "Tech"
+      ],
+      "note": "Check delivery and any bonus-offer conditions.",
+      "mode": "direct_link",
+      "private_feed": "https://www.ozbargain.com.au/deals/thegoodguys.com.au/feed"
+    },
+    {
+      "name": "Lenovo AU",
+      "domain": "lenovo.com",
+      "url": "https://www.lenovo.com/au/en/d/deals/laptops/",
+      "categories": [
+        "Laptops",
+        "PC parts"
+      ],
+      "note": "Check coupon eligibility and estimated delivery.",
+      "mode": "direct_link",
+      "private_feed": "https://www.ozbargain.com.au/deals/lenovo.com/feed"
+    },
+    {
+      "name": "Dell AU",
+      "domain": "dell.com",
+      "url": "https://www.dell.com/en-au/shop/laptop-computers/scr/laptop",
+      "categories": [
+        "Laptops",
+        "PC parts"
+      ],
+      "note": "Compare RAM, storage, display and warranty as well as price.",
+      "mode": "direct_link",
+      "private_feed": "https://www.ozbargain.com.au/deals/dell.com/feed"
+    },
+    {
+      "name": "HP AU",
+      "domain": "hp.com",
+      "url": "https://www.hp.com/au-en/shop/laptops-tablets/personal-laptops.html?offer-type=sale",
+      "categories": [
+        "Laptops"
+      ],
+      "note": "Look for the final price after any eligible coupon.",
+      "mode": "direct_link",
+      "private_feed": "https://www.ozbargain.com.au/deals/hp.com/feed"
+    },
+    {
+      "name": "Scorptec",
+      "domain": "scorptec.com.au",
+      "url": "https://www.scorptec.com.au/clearancesale",
+      "categories": [
+        "Laptops",
+        "PC parts",
+        "Tech"
+      ],
+      "note": "Check clearance condition, stock and warranty.",
+      "mode": "direct_link",
+      "private_feed": "https://www.ozbargain.com.au/deals/scorptec.com.au/feed"
+    },
+    {
+      "name": "Mwave",
+      "domain": "mwave.com.au",
+      "url": "https://www.mwave.com.au/pages/couponcode",
+      "categories": [
+        "Laptops",
+        "PC parts",
+        "Tech"
+      ],
+      "note": "Read coupon exclusions and expiry before checkout.",
+      "mode": "direct_link",
+      "private_feed": "https://www.ozbargain.com.au/deals/mwave.com.au/feed"
+    },
+    {
+      "name": "PC Case Gear",
+      "domain": "pccasegear.com",
+      "url": "https://www.pccasegear.com/specials",
+      "categories": [
+        "PC parts",
+        "Tech"
+      ],
+      "note": "Compare the exact component model and shipping.",
+      "mode": "direct_link",
+      "private_feed": "https://www.ozbargain.com.au/deals/pccasegear.com/feed"
+    },
+    {
+      "name": "PLE Computers",
+      "domain": "ple.com.au",
+      "url": "https://www.ple.com.au/CategoryGroups/10/specials",
+      "categories": [
+        "Laptops",
+        "PC parts",
+        "Tech"
+      ],
+      "note": "Confirm online stock and collection availability.",
+      "mode": "direct_link",
+      "private_feed": "https://www.ozbargain.com.au/deals/ple.com.au/feed"
+    },
+    {
+      "name": "Centre Com",
+      "domain": "centrecom.com.au",
+      "url": "https://www.centrecom.com.au/laptops",
+      "categories": [
+        "Laptops",
+        "PC parts"
+      ],
+      "note": "Laptop catalogue; not every product is discounted.",
+      "mode": "direct_link",
+      "private_feed": "https://www.ozbargain.com.au/deals/centrecom.com.au/feed"
+    },
+    {
+      "name": "Umart",
+      "domain": "umart.com.au",
+      "url": "https://www.umart.com.au/",
+      "categories": [
+        "Laptops",
+        "PC parts",
+        "Tech"
+      ],
+      "note": "Retailer catalogue; check online availability and delivery.",
+      "mode": "direct_link",
+      "private_feed": "https://www.ozbargain.com.au/deals/umart.com.au/feed"
+    },
+    {
+      "name": "EB Games",
+      "domain": "ebgames.com.au",
+      "url": "https://www.ebgames.com.au/featured/playstation-5",
+      "categories": [
+        "PS5 & gaming"
+      ],
+      "note": "Distinguish new, preowned, refurbished and trade-in offers.",
+      "mode": "direct_link",
+      "private_feed": "https://www.ozbargain.com.au/deals/ebgames.com.au/feed"
+    },
+    {
+      "name": "Kogan",
+      "domain": "kogan.com",
+      "url": "https://www.kogan.com/au/c/tech-sale/",
+      "categories": [
+        "Laptops",
+        "PS5 & gaming",
+        "Tech"
+      ],
+      "note": "Check marketplace seller, import status and membership pricing.",
+      "mode": "direct_link",
+      "private_feed": "https://www.ozbargain.com.au/deals/kogan.com/feed"
+    }
+  ]
+}
