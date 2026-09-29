@@ -22,7 +22,7 @@ for name in os.listdir(src):
             s = s.replace("{{" + k + "}}", v)
         if name.endswith(".html"):
             s = rewrite_html(s, affiliates)
-            for asset in ("app.js", "tech.js", "share.js", "style.css"):
+            for asset in ("app.js", "tech.js", "share.js", "share-deal.js", "style.css"):
                 digest = hashlib.sha256(open(os.path.join(src, asset), "rb").read()).hexdigest()[:12]
                 s = s.replace(f'"{asset}"', f'"{asset}?v={digest}"')
         open(os.path.join(out, name), "w").write(s)

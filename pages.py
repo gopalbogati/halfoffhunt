@@ -16,15 +16,26 @@ def aud(n):
     return f"${n:,.2f}".replace(".00", "")
 
 
+BASE = ""   # set by build(); share links point back to this site
+
+
+def share_attrs(d):
+    from urllib.parse import urlencode
+    url = f"{BASE}/?" + urlencode({"q": d["title"], "store": d["store"]})
+    text = f'-{d["pct"]}%: {d["title"]} {aud(d["price"])} (was {aud(d["was"])}) at {d["store"]}'
+    return f'data-share-url="{e(url)}" data-share-text="{e(text)}"'
+
+
 def card(d, prefix=""):
     img = f'<img src="{e(d["img"])}" alt="{e(d["title"])}" loading="lazy" decoding="async">' if d.get("img") else ""
     brand = f'{e(d["brand"])} · ' if d.get("brand") and d["brand"] != d["store"] else ""
     flag = '<span class="flag">Possible error</span>' if d.get("error") else ""
-    return (f'<a class="card{" error" if d.get("error") else ""}" href="{e(d["url"])}" target="_blank" rel="noopener sponsored">'
+    return (f'<article class="card{" error" if d.get("error") else ""}"><a class="deal-link" href="{e(d["url"])}" target="_blank" rel="noopener sponsored">'
             f'<div class="ph">{img}<span class="pct">-{d["pct"]}%</span>{flag}</div>'
             f'<div class="info"><div class="meta">{brand}{e(d["store"])}</div><div class="title">{e(d["title"])}</div>'
             f'<div class="prices"><span class="now">{aud(d["price"])}</span><span class="was">{aud(d["was"])}</span>'
-            f'<span class="save">Save {aud(round(d["was"] - d["price"]))}</span></div></div></a>')
+            f'<span class="save">Save {aud(round(d["was"] - d["price"]))}</span></div></div></a>'
+            f'<div class="card-actions"><button class="ghost" type="button" {share_attrs(d)}>Share</button></div></article>')
 
 
 def top_picks(deals, n):
@@ -63,7 +74,7 @@ PAGE = """<!doctype html><html lang="en-AU"><head><meta charset="utf-8"><meta na
 <p><a class="btn light" href="../?{q}">Filter &amp; search these deals</a></p></div></header>
 <main class="wrap"><div class="grid" style="margin-top:24px">{cards}</div>{more}{links}</main>
 <footer class="foot"><div class="wrap"><p>Prices come from each store's public product data and can change or sell out; the store's checkout price is final. Some links may be affiliate links. <a href="../about.html#disclosure">Disclosure</a> · <a href="../privacy.html">Privacy</a></p></div></footer>
-</body></html>"""
+<script src="../share-deal.js" defer></script></body></html>"""
 
 
 def build(site, cfg):
@@ -73,6 +84,8 @@ def build(site, cfg):
     data = json.load(open(path))
     deals = data["deals"]
     base = cfg["site_url"].rstrip("/")
+    global BASE
+    BASE = base
     brand = e(cfg["brand"])
     os.makedirs(os.path.join(site, "sale"), exist_ok=True)
     made = []

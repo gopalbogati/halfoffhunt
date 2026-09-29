@@ -113,7 +113,8 @@
       if (share) {
         const d = deals.find(d => d.id === share.dataset.share);
         const url = new URL(location.pathname, location.origin); url.searchParams.set("q", d.title); url.searchParams.set("store", d.store);
-        try { if (navigator.share) await navigator.share({title:d.title, url:url.href}); else { await navigator.clipboard.writeText(url.href); share.textContent="Copied!"; } } catch (e) { if (e.name !== "AbortError") $("#notice").textContent = "To share, copy this link: " + url.href; }
+        const text = `-${d.pct}%: ${d.title} ${aud(d.price)} (was ${aud(d.was)}) at ${d.store}`;
+        try { if (navigator.share) await navigator.share({title:text, text, url:url.href}); else { await navigator.clipboard.writeText(`${text} ${url.href}`); share.textContent="Copied!"; } } catch (e) { if (e.name !== "AbortError") $("#notice").textContent = "To share, copy this link: " + url.href; }
       }
     };
 
