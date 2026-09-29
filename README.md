@@ -105,7 +105,7 @@ See [AFFILIATE-SETUP.md](AFFILIATE-SETUP.md) for official application links and 
 
 ## Private alert settings (owner only)
 
-Personal choices are not stored in this repository. They live in the repository **variable** `ALERT_SETTINGS` (Settings → Secrets and variables → Actions → Variables), which only repository admins can see. Locally, put the same text in a git-ignored `private_settings.txt`.
+Personal choices are not stored in this repository. They live in the repository **secret** `ALERT_SETTINGS` (Settings → Secrets and variables → Actions → Secrets). It must be a secret, not a variable: workflow logs on a public repository are public, and only secrets are hidden in them. GitHub never shows a secret again, so to change a choice, paste the whole list again. Locally, put the same text in a git-ignored `private_settings.txt`.
 
 One `name: mode` per line, where mode is `push` (phone buzzes), `quiet` (no sound; waits in the ntfy app) or `off`:
 
