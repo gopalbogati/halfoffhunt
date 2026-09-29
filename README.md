@@ -2,7 +2,7 @@
 
 An Australian deal index: in-stock items at **50% off or more** from popular Australian online stores, checked every 30 minutes and published as a static website with phone alerts and an RSS feed.
 
-**Live site:** https://gopalbogati.github.io/halfoffhunt/
+**Live site:** https://halfoffhunt.pages.dev/
 
 ## What runs
 

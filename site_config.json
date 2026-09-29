@@ -1,7 +1,7 @@
 {
   "brand": "Half Off Hunt",
   "tagline": "Discover 50%+ markdowns from Australian stores. Scheduled scans every 30 minutes; prices and stock can change.",
-  "site_url": "https://gopalbogati.github.io/halfoffhunt",
+  "site_url": "https://halfoffhunt.pages.dev",
   "min_pct": 50,
   "alert_pct": 80,
   "public_ntfy_topic": "halfoffhunt-au",
