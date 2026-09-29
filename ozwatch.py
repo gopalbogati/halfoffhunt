@@ -19,6 +19,8 @@ from datetime import datetime, timezone
 from email.utils import parsedate_to_datetime
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 
+import private_settings
+
 # ---------------- CONFIG ----------------
 FEEDS = [
     "https://www.ozbargain.com.au/deals/feed",
@@ -51,10 +53,15 @@ MIN_VOTES_FOR_DISCOUNT = 0     # net votes needed for pure-discount hits (errors
 BIG_STORES = ["Samsung", "Apple", "Dell", "Lenovo", "Chemist Warehouse", "Priceline", "rebel", "Dyson",
               "Appliances Online", "Mwave", "Scorptec", "PCCaseGear", "Umart", "Bing Lee", "Kogan", "Amazon AU", "JB Hi-Fi", "Kmart", "Big W", "BIG W", "Officeworks", "The Good Guys", "Harvey Norman",
               "Myer", "David Jones", "THE ICONIC", "The Iconic", "eBay", "Coles", "Woolworths", "Bunnings", "Target", "Costco", "Aldi", "ALDI"]
-WATCH_KEYWORDS = []            # e.g. ["laptop", "rtx", "lego", "dyson"] - always flag these
-FOOD_MODE = True               # food & drink alerts, filtered to MY_STATE
-MY_STATE = "NSW"               # Sydney
-OTHER_STATES = [x for x in ("NSW", "VIC", "QLD", "WA", "SA", "TAS", "ACT", "NT") if x != MY_STATE]
+# Personal choices (home state, food alerts, extra keywords, push/quiet/off per alert type)
+# come from the private ALERT_SETTINGS variable, never from this public file. See private_settings.py.
+SETTINGS = private_settings.load(os.path.dirname(os.path.abspath(__file__)))
+WATCH_KEYWORDS = SETTINGS["watch"]
+MY_STATE = SETTINGS["state"]
+FOOD_MODE = SETTINGS["modes"].get("food", "off") != "off"
+OTHER_STATES = [x for x in private_settings.STATES if x != MY_STATE] if MY_STATE else []
+OTHER_CITIES = [c for st in OTHER_STATES for c in private_settings.STATE_CITIES[st]]
+MY_CITIES = private_settings.STATE_CITIES.get(MY_STATE, [])
 FOOD_MAX_PRICE = 3.0           # a meal/drink at or under this counts as a steal
 FOOD_MIN_PCT = 50              # or this % off / half price / 2-for-1
 FOOD_WORDS = re.compile(
@@ -158,7 +165,8 @@ def food_score(d, price, was, pct):
     tagtxt = tags.group(1).upper() if tags else ""
     if any(re.search(rf"\b{st}\b", tagtxt) for st in OTHER_STATES) and MY_STATE not in tagtxt:
         return 0, []
-    if re.search(r"melbourne|brisbane|perth|adelaide|canberra|hobart|darwin|gold coast|victoria|queensland", t, re.I) and not re.search("sydney", t, re.I):
+    if (OTHER_CITIES and re.search("|".join(OTHER_CITIES), t, re.I)
+            and not (MY_CITIES and re.search("|".join(MY_CITIES), t, re.I))):
         return 0, []
     sc, rs = 0, []
     if re.search(r"\bfree\b", t, re.I) and not re.search(r"free (delivery|shipping|postage|c&c|pickup|returns)|delivery free", t, re.I):
@@ -169,8 +177,8 @@ def food_score(d, price, was, pct):
         sc += pct * 0.6; rs.append(f"{pct}% off food")
     if price is not None and 0 < price <= FOOD_MAX_PRICE and not re.search(r"cashback|voucher|gift ?card", t, re.I):
         sc += 40; rs.append(f"food under ${FOOD_MAX_PRICE:g}")
-    if sc and MY_STATE in tagtxt:
-        sc += 10; rs.append("Sydney/NSW")
+    if sc and MY_STATE and MY_STATE in tagtxt:
+        sc += 10; rs.append(MY_STATE)
     if sc:
         rs.insert(0, "FOOD")
     return sc, rs
@@ -222,7 +230,7 @@ def classify(d):
     tg = re.match(r"\s*((?:\[[^\]]+\]\s*)+)", t)
     tg = tg.group(1).upper() if tg else ""
     if any(re.search(rf"\b{st}\b", tg) for st in OTHER_STATES) and MY_STATE not in tg:
-        return 0, []   # state-locked deal for somewhere other than Sydney
+        return 0, []   # state-locked deal for somewhere other than the home state
     reasons, score = [], 0
     if STRONG_ERROR.search(t):
         reasons.append("PRICE ERROR"); score += 100
@@ -238,7 +246,9 @@ def classify(d):
         reasons.append(f"under ${CHEAP_UNDER:g}"); score += 25
     if price == 0.0 or re.search(r"\bfree(bie)?\b", t, re.I):
         if not re.search(r"free (delivery|shipping|postage|c&c|pickup|returns)|\+ free", t, re.I) or price == 0.0:
-            if not re.match(r"\s*\[(" + "|".join(OTHER_STATES) + r")", t, re.I):
+            elsewhere = OTHER_CITIES and re.search("|".join(OTHER_CITIES), t, re.I) and not (
+                MY_CITIES and re.search("|".join(MY_CITIES), t, re.I))
+            if not (OTHER_STATES and re.match(r"\s*\[(" + "|".join(OTHER_STATES) + r")", t, re.I)) and not elsewhere:
                 reasons.append("FREE"); score += 8
     if FOOD_MODE:
         fs, fr = food_score(d, price, was, pct)
@@ -280,14 +290,15 @@ def save_state(s):
     os.replace(tmp, STATE)
 
 
-def push(title, body, url, urgent):
-    if not NTFY_TOPIC:
+def push(title, body, url, urgent, mode="push"):
+    if not NTFY_TOPIC or mode == "off":
         return
+    priority = private_settings.QUIET_PRIORITY if mode == "quiet" else ("5" if urgent else "3")
     try:
         req = urllib.request.Request(
             f"{NTFY_SERVER}/{NTFY_TOPIC}", data=body.encode("utf-8"), method="POST",
             headers={"Title": title.encode("ascii", "ignore").decode(), "Click": url,
-                     "Priority": "5" if urgent else "3", "Tags": "rotating_light" if urgent else "moneybag"})
+                     "Priority": priority, "Tags": "rotating_light" if urgent else "moneybag"})
         urllib.request.urlopen(req, timeout=15).read()
     except Exception as e:
         print("  ! ntfy:", e, file=sys.stderr)
@@ -350,15 +361,16 @@ def run_once(first_run_silent=False):
     sent = 0
     for v in sorted(state.values(), key=lambda v: -v["score"]):
         if v["score"] and not v["expired"] and not v["notified"]:
-            if seen_any and sent >= TECH_CONFIG.get("max_alerts_per_run", 6):
+            mode = private_settings.mode_for(v["reasons"], SETTINGS)
+            if seen_any and mode != "off" and sent >= TECH_CONFIG.get("max_alerts_per_run", 6):
                 continue
             v["notified"] = True
             history[alert_key(v["id"])] = time.time()
-            if seen_any:  # don't spam on very first run
+            if seen_any and mode != "off":  # don't spam on very first run; 'off' types are never sent
                 notify("OzBargain: " + ", ".join(v["reasons"][:2]), v["title"], v["link"])
                 if v["score"] >= NTFY_MIN_SCORE:
                     push("OzBargain: " + ", ".join(v["reasons"][:2]), v["title"], v["link"],
-                         any("ERROR" in r for r in v["reasons"]))
+                         any("ERROR" in r for r in v["reasons"]), mode)
                 sent += 1
                 if not ALERTS_ONLY:
                     print("NEW:", v["reasons"], v["title"])
@@ -477,6 +489,10 @@ def serve(port):
 
 
 if __name__ == "__main__":
+    if SETTINGS["problems"]:
+        # line numbers only: workflow logs on a public repo are public
+        print("  ! ALERT_SETTINGS has", len(SETTINGS["problems"]), "unreadable line(s):",
+              ", ".join(p.split(":")[0] for p in SETTINGS["problems"]), "- those use defaults", file=sys.stderr)
     ap = argparse.ArgumentParser()
     ap.add_argument("--alerts-only", action="store_true", help="send personal notifications without saving RSS content or a dashboard")
     ap.add_argument("--loop", type=int, default=0, help="poll interval seconds (0 = once)")

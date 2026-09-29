@@ -102,3 +102,25 @@ GitHub uses `ozwatch.py --alerts-only`: only SHA-256 deal-ID notification finger
 `project.html` is a shareable development showcase with original social artwork, public-beta limitations, repository link, LinkedIn share button and copyable draft. This does not automatically post to LinkedIn.
 
 See [AFFILIATE-SETUP.md](AFFILIATE-SETUP.md) for official application links and the `configure_affiliate.py` command. No earning IDs are active by default. Approved links are visibly labelled, and private community feed content is not monetised or republished by this feature.
+
+## Private alert settings (owner only)
+
+Personal choices are not stored in this repository. They live in the repository **variable** `ALERT_SETTINGS` (Settings → Secrets and variables → Actions → Variables), which only repository admins can see. Locally, put the same text in a git-ignored `private_settings.txt`.
+
+One `name: mode` per line, where mode is `push` (phone buzzes), `quiet` (no sound; waits in the ntfy app) or `off`:
+
+```
+price_errors: push
+big_discounts: quiet
+cheap: quiet
+freebies: quiet
+food: push
+tech: push           # default for every rule in tech_watch.json
+ps5_consoles: off    # or set one rule by name
+store_deals: push    # 80%+ retailer finds; the public follower channel is unaffected
+keywords: push
+state: NSW           # home state for food and state-only deals
+watch: dyson, lego   # extra words that always match
+```
+
+Without the variable, alerts use neutral defaults: no home state, food off, no extra words. Unreadable lines are reported in the Actions log by line number only.

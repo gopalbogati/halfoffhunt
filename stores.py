@@ -17,6 +17,8 @@ import argparse, html, json, math, os, re, sys, time, urllib.parse, urllib.reque
 from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime, timezone
 
+import private_settings
+
 HERE = os.path.dirname(os.path.abspath(__file__))
 SITE = os.path.join(HERE, "site")
 STATE = os.path.join(HERE, "stores_state.json")
@@ -28,6 +30,7 @@ MAX_ALERTS_PER_RUN = 6
 MAX_PAGES = 4                                # x250 products per collection
 PER_STORE_CAP = 150
 UA = {"User-Agent": "Mozilla/5.0 (compatible; deal-index; +https://github.com/)"}
+SETTINGS = private_settings.load(HERE)   # owner's push/quiet/off choice for private alerts
 
 
 def get_json(url):
@@ -141,10 +144,18 @@ def post(url, data, headers=None):
 def alert(d):
     head = ("POSSIBLE PRICE ERROR: " if d["error"] else "") + f"{d['pct']}% off at {d['store']}"
     body = f"{d['title']} - ${d['price']:,.2f} (was ${d['was']:,.2f})"
-    for topic in filter(None, [os.environ.get("NTFY_TOPIC"), os.environ.get("PUBLIC_NTFY_TOPIC") or CONFIG.get("public_ntfy_topic")]):
+    loud = "5" if d["error"] else "4"
+    private_mode = SETTINGS["modes"].get("store_deals", "push")
+    targets = []
+    if os.environ.get("NTFY_TOPIC") and private_mode != "off":
+        targets.append((os.environ["NTFY_TOPIC"], private_settings.QUIET_PRIORITY if private_mode == "quiet" else loud))
+    public = os.environ.get("PUBLIC_NTFY_TOPIC") or CONFIG.get("public_ntfy_topic")
+    if public:
+        targets.append((public, loud))   # the public follower channel is not affected by private settings
+    for topic, priority in targets:
         post(f"https://ntfy.sh/{topic}", body.encode(), {
             "Title": head.encode("ascii", "ignore").decode(), "Click": d["url"],
-            "Priority": "5" if d["error"] else "4", "Tags": "rotating_light" if d["error"] else "tag"})
+            "Priority": priority, "Tags": "rotating_light" if d["error"] else "tag"})
     tok, chat = os.environ.get("TELEGRAM_BOT_TOKEN"), os.environ.get("TELEGRAM_CHAT_ID")
     if tok and chat:
         msg = f"<b>{html.escape(head)}</b>\n{html.escape(body)}\n<a href=\"{html.escape(d['url'])}\">View deal</a>"

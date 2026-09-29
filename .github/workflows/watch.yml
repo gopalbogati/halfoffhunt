@@ -49,15 +49,17 @@ jobs:
             site/feed.xml
           key: state-v2-none
           restore-keys: state-v2-
-      - name: Personal RSS alerts (tech, price errors and Sydney food)
+      - name: Personal RSS alerts (choices come from the private ALERT_SETTINGS variable)
         continue-on-error: true
         run: python3 ozwatch.py --alerts-only
         env:
           NTFY_TOPIC: ${{ secrets.NTFY_TOPIC }}
+          ALERT_SETTINGS: ${{ vars.ALERT_SETTINGS }}
       - name: Retailer sale scan (every 30 min)
         run: python3 stores.py --if-due 28
         env:
           NTFY_TOPIC: ${{ secrets.NTFY_TOPIC }}
+          ALERT_SETTINGS: ${{ vars.ALERT_SETTINGS }}
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
       - name: Save state
