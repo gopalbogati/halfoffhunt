@@ -68,7 +68,7 @@
         <div class="meta">${esc(d.brand && d.brand !== d.store ? d.brand + " · " : "")}${esc(d.store)}</div>
         <div class="title">${esc(d.title)}${d.variant ? ` <span class="meta">(${esc(d.variant)})</span>` : ""}</div>
         <div class="prices"><span class="now">${aud(d.price)}</span><span class="was">${aud(d.was)}</span>
-        <span class="save">Save ${aud(Math.round(d.was - d.price))}</span></div>
+        <span class="save">Save ${aud(Math.round((d.was - d.price) * 100) / 100)}</span></div>
         <p class="small">Retailer’s “was” price · delivery extra unless stated</p>
         ${d.checked_at ? `<span class="meta">Checked ${ago(d.checked_at * 1000)}</span>` : ""}
       </div></a><div class="card-actions"><button class="ghost" data-save="${esc(d.id)}" aria-pressed="${saved.has(d.id)}">${saved.has(d.id) ? "♥ Saved" : "♡ Save"}</button><button class="ghost" data-share="${esc(d.id)}">Share</button></div></article>`;

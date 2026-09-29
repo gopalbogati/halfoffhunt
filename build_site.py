@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Render site_src/ into site/ using values from site_config.json ({{brand}} etc)."""
-import json, os, shutil
+import json, os, shutil, hashlib
 from datetime import date
 HERE = os.path.dirname(os.path.abspath(__file__))
 cfg = json.load(open(os.path.join(HERE, "site_config.json")))
@@ -15,6 +15,10 @@ for name in os.listdir(src):
         s = open(p).read()
         for k, v in vals.items():
             s = s.replace("{{" + k + "}}", v)
+        if name.endswith(".html"):
+            for asset in ("app.js", "style.css"):
+                digest = hashlib.sha256(open(os.path.join(src, asset), "rb").read()).hexdigest()[:12]
+                s = s.replace(f'"{asset}"', f'"{asset}?v={digest}"')
         open(os.path.join(out, name), "w").write(s)
     else:
         shutil.copy(p, out)
