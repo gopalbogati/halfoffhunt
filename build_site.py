@@ -30,8 +30,21 @@ for name in os.listdir(src):
         shutil.copy(p, out)
 open(os.path.join(out, "robots.txt"), "w").write(f"User-agent: *\nAllow: /\nSitemap: {vals['site_url']}/sitemap.xml\n")
 import pages as P
+CLEAN = "pages.dev" in vals["site_url"] or cfg.get("clean_urls", False)
+def clean(p):
+    return p[:-5] if CLEAN and p.endswith(".html") else p
 pages = ["", "about.html", "privacy.html", "stores.html", "submit.html", "terms.html", "tech.html", "private-alerts.html", "refurbished.html", "project.html"] + P.build(out, cfg)
 open(os.path.join(out, "sitemap.xml"), "w").write('<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' +
-    "".join(f"<url><loc>{vals['site_url']}/{p}</loc></url>" for p in pages) + "</urlset>")
+    "".join(f"<url><loc>{vals['site_url']}/{clean(p)}</loc></url>" for p in pages) + "</urlset>")
+
+# Cloudflare Pages serves /x.html at /x and 308-redirects the .html form, so canonical
+# addresses must be the extensionless ones there. GitHub Pages keeps .html.
+if CLEAN:
+    import re, glob
+    for f in glob.glob(os.path.join(out, "**", "*.html"), recursive=True):
+        t = open(f).read()
+        t2 = re.sub(r'((?:rel="canonical" href|property="og:url" content)="[^"]*?)\.html"', r'\1"', t)
+        if t2 != t:
+            open(f, "w").write(t2)
 open(os.path.join(out, ".nojekyll"), "w").close()
 print("site built ->", out)
