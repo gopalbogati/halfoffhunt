@@ -36,6 +36,8 @@ STRONG_ERROR = re.compile(r"price[\s-]*error|pricing[\s-]*(error|mistake|glitch)
 MIN_DISCOUNT_PCT = 60          # flag anything at least this % off (when Was/RRP is stated)
 CHEAP_UNDER = 5.0              # flag any priced item at or under this ($)
 MIN_VOTES_FOR_DISCOUNT = 0     # net votes needed for pure-discount hits (errors always shown)
+BIG_STORES = ["Amazon AU", "JB Hi-Fi", "Kmart", "Big W", "BIG W", "Officeworks", "The Good Guys", "Harvey Norman",
+              "Myer", "David Jones", "THE ICONIC", "The Iconic", "eBay", "Coles", "Woolworths", "Bunnings", "Target", "Costco", "Aldi", "ALDI"]
 WATCH_KEYWORDS = []            # e.g. ["laptop", "rtx", "lego", "dyson"] - always flag these
 FOOD_MODE = True               # food & drink alerts, filtered to MY_STATE
 MY_STATE = "NSW"               # Sydney
@@ -184,6 +186,9 @@ def classify(d):
         fs, fr = food_score(d, price, was, pct)
         if fs:
             score += fs; reasons += fr
+    store = re.search(r"@\s*([^@]+)$", t)
+    if store and reasons and any(b.lower() in store.group(1).lower() for b in BIG_STORES):
+        reasons.append("big store"); score += 20
     for k in WATCH_KEYWORDS:
         if k.lower() in t.lower():
             reasons.append(f"watch: {k}"); score += 40
@@ -270,6 +275,7 @@ def run_once(first_run_silent=False):
                 print("NEW:", v["reasons"], v["title"])
     save_state(state)
     write_html(state, now)
+    write_public(state, now)
     live = [v for v in state.values() if v["score"] and not v["expired"]]
     print(f"[{now:%H:%M:%S}] scanned {found} items, {len(live)} live hits -> {OUT}")
 
@@ -309,6 +315,20 @@ const f=c.dataset.f;document.querySelectorAll('.card').forEach(k=>{k.style.displ
 def ago(ts):
     s = int(time.time() - ts)
     return f"{s//60}m ago" if s < 3600 else f"{s//3600}h ago" if s < 86400 else f"{s//86400}d ago"
+
+
+def write_public(state, now):
+    """Headlines only, linking back to the OzBargain thread (no images, no affiliate links)."""
+    live = [v for v in state.values() if v["score"] and not v["expired"]
+            and (v["votes_pos"] - v["votes_neg"]) >= 5]           # community-checked only
+    live.sort(key=lambda v: -v["score"])
+    out = [{"title": v["title"], "link": v["link"], "votes": v["votes_pos"] - v["votes_neg"],
+            "comments": v["comments"], "tags": [r for r in v["reasons"] if not r.startswith("watch")][:3],
+            "expiry": v.get("expiry"), "seen": v["seen"]} for v in live[:40]]
+    d = os.path.join(HERE, "site", "data")
+    os.makedirs(d, exist_ok=True)
+    with open(os.path.join(d, "ozb.json"), "w") as f:
+        json.dump({"updated": now.isoformat(timespec="seconds"), "items": out}, f, separators=(",", ":"))
 
 
 def write_html(state, now):

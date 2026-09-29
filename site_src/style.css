@@ -99,3 +99,17 @@ code{font:600 14px ui-monospace,Menlo,monospace;background:var(--chip);padding:6
 .page .top{padding-bottom:0}
 @media(min-width:720px){.toolbar{position:sticky}}
 @media(max-width:719px){.controls{grid-template-columns:1fr 1fr 1fr}.controls select{font-size:13px;padding:9px 8px}.flag{font-size:10px;padding:4px 8px}}
+
+/* community picks */
+.ozb{margin-top:56px}
+.ozb h2{font:800 32px/1.05 "Bricolage Grotesque",Inter,sans-serif;letter-spacing:-.03em;margin:0 0 8px}
+.ozb-head p{color:var(--muted);max-width:720px;margin:0 0 18px}
+.ozb-list{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+@media(min-width:900px){.ozb-list{grid-template-columns:1fr 1fr}}
+.ozb-list a{display:grid;grid-template-columns:auto 1fr;gap:4px 12px;align-items:start;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:12px 14px;text-decoration:none}
+.ozb-list a:hover{border-color:var(--ink)}
+.ozb-votes{grid-row:span 2;font:800 15px/1 "Bricolage Grotesque",Inter,sans-serif;color:var(--good);background:var(--chip);border-radius:8px;padding:8px 8px;min-width:48px;text-align:center}
+.ozb-t{font-weight:600;font-size:14px;line-height:1.35}
+.ozb-tags{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.ozb-tags em{font-style:normal;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.03em;background:var(--chip);border-radius:999px;padding:2px 8px}
+.ozb-tags small{color:var(--muted);font-size:12px}

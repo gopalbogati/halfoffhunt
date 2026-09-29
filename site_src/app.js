@@ -126,4 +126,12 @@
     }
   }
   load();
+
+  fetch("data/ozb.json", { cache: "no-store" }).then((r) => r.json()).then((o) => {
+    if (!o.items || !o.items.length) return;
+    $("#ozb").innerHTML = o.items.map((i) => `<li><a href="${esc(i.link)}" target="_blank" rel="noopener">
+      <span class="ozb-votes">+${i.votes}</span><span class="ozb-t">${esc(i.title)}</span>
+      <span class="ozb-tags">${i.tags.map((t) => `<em>${esc(t)}</em>`).join("")}${i.comments ? `<small>${i.comments} comments</small>` : ""}</span></a></li>`).join("");
+    $("#community").hidden = false;
+  }).catch(() => {});
 })();
