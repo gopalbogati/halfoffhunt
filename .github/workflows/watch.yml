@@ -40,6 +40,7 @@ jobs:
         run: |
           python3 -m unittest discover -s tests -v
           for file in site_src/*.js; do node --check "$file"; done
+          node --test tests/*.test.js
       - name: Restore state
         uses: actions/cache/restore@v4
         with:
@@ -125,6 +126,6 @@ jobs:
         env:
           CF_PROJECT: ${{ vars.CLOUDFLARE_PROJECT_NAME }}
         run: |
-          for route in / /tech /buyback /refurbished /data/deals.json; do
+          for route in / /tech /buyback /refurbished /data/deals.json /data/buyback.json; do
             curl --fail --silent --show-error --retry 3 --retry-delay 5 "https://${CF_PROJECT}.pages.dev${route}" --output /dev/null
           done

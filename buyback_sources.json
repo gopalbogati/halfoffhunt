@@ -58,6 +58,21 @@
       "payout": "Cash sale in store",
       "note": "Request an outright-sale quote for supported computers, phones, cameras and consoles. Value depends on inspection and local demand.",
       "mode": "direct_link"
+    },
+    {
+      "name": "Mobile Guru",
+      "domain": "mobileguruaustralia.com.au",
+      "url": "https://www.mobileguruaustralia.com.au/",
+      "categories": [
+        "Phones & tablets",
+        "Laptops",
+        "Desktop PCs",
+        "PS5 & gaming",
+        "Audio & wearables"
+      ],
+      "payout": "Bank transfer after assessment",
+      "note": "Supports phones, computers, watches and gaming devices. Match condition and battery deductions before comparing quotes.",
+      "mode": "direct_link"
     }
   ]
 }

@@ -1,0 +1,33 @@
+{
+  "profiles": [
+    {
+      "id": "iphone-14-pro-max-256gb-working-low-battery",
+      "label": "iPhone 14 Pro Max \u00b7 256GB",
+      "condition": "Used and working, light wear, battery health below 80%, no other faults. Unlocked and no activation lock. Final value depends on each buyer\u2019s assessment."
+    }
+  ],
+  "quotes": [
+    {
+      "provider": "Mobile Monster",
+      "profile": "iphone-14-pro-max-256gb-working-low-battery",
+      "amount": 530,
+      "fees": 0,
+      "payout": "cash",
+      "currency": "AUD",
+      "checked_at": "2026-10-05T00:37:00Z",
+      "url": "https://mobilemonster.com.au/sell-your-phone/apple/mobiles/iphone-14/iphone-14-pro-max-256gb?used=yes&working=yes&condition=light&battery=low",
+      "note": "Selected Working with faults, light/moderate wear and battery below 80%. Recheck the quote before selling."
+    },
+    {
+      "provider": "Mobile Guru",
+      "profile": "iphone-14-pro-max-256gb-working-low-battery",
+      "amount": 555,
+      "fees": 0,
+      "payout": "cash",
+      "currency": "AUD",
+      "checked_at": "2026-10-05T00:39:55+00:00",
+      "url": "https://www.mobileguruaustralia.com.au/product/sell-iphone-14-pro-max-australia/",
+      "note": "Selected 256GB, Working and battery health below 80%: $660 less $105 battery deduction. Re-select these options at the buyer."
+    }
+  ]
+}

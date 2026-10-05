@@ -15,6 +15,10 @@ vals = {"brand": cfg["brand"], "tagline": cfg["tagline"], "site_url": cfg["site_
 vals["project_share_url"] = quote(vals["site_url"] + "/project.html", safe="")
 src, out = os.path.join(HERE, "site_src"), os.path.join(HERE, "site")
 os.makedirs(out, exist_ok=True)
+os.makedirs(os.path.join(out, "data"), exist_ok=True)
+quotes = json.loads(Path(HERE, "buyback_quotes.json").read_text())
+quotes['providers'] = json.loads(Path(HERE, "buyback_sources.json").read_text())['stores']
+Path(out, "data", "buyback.json").write_text(json.dumps(quotes, separators=(',', ':')))
 for name in os.listdir(src):
     p = os.path.join(src, name)
     if name.endswith((".html", ".js", ".css", ".svg", ".txt", ".xml")):
@@ -26,7 +30,7 @@ for name in os.listdir(src):
             if manifest:
                 s = render_directory(s, json.loads(Path(HERE, manifest).read_text())["stores"])
             s = rewrite_html(s, affiliates)
-            for asset in ("app.js", "tech.js", "share.js", "share-deal.js", "style.css"):
+            for asset in ("app.js", "tech.js", "buyback.js", "share.js", "share-deal.js", "style.css"):
                 digest = hashlib.sha256(open(os.path.join(src, asset), "rb").read()).hexdigest()[:12]
                 s = s.replace(f'"{asset}"', f'"{asset}?v={digest}"')
         open(os.path.join(out, name), "w").write(s)

@@ -84,7 +84,7 @@ python3 ozwatch.py --loop 900 --serve
 
 Mac shortcut: `bash start-private-tech.command`. Stop with Control+C. Your computer must remain awake. No package installation is needed beyond Python 3. The local server serves only the generated dashboard, not repository files. `state.json` and `deals.html` remain ignored by git.
 
-`tech_watch.json` configures laptop, PS5 console, gaming accessory and PC-component matching. Three net votes are required for tech matches; there is no 50% discount requirement. This identifies candidates, not verified good prices. Specific models, membership, shipping, trade-ins, refurbished stock and eligibility still require checking. The existing food and price-error rules remain available. General, computing and gaming feeds run each pass; 4 of the 46 retailer feeds rotate each run, using a persisted cursor so delayed runs cannot skip stores (about 50 minutes per retailer at a five-minute schedule; 150 minutes at the local 15-minute interval, longer if scans are delayed). RSS calls that fail are not bypassed.
+`tech_watch.json` configures laptop, PS5 console, gaming accessory and PC-component matching. Three net votes are required for tech matches; there is no 50% discount requirement. This identifies candidates, not verified good prices. Specific models, membership, shipping, trade-ins, refurbished stock and eligibility still require checking. The existing food and price-error rules remain available. General, computing and gaming feeds run each pass; 4 of the 47 retailer feeds rotate each run, using a persisted cursor so delayed runs cannot skip stores (about 50 minutes per retailer at a five-minute schedule; 150 minutes at the local 15-minute interval, longer if scans are delayed). RSS calls that fail are not bypassed.
 
 GitHub uses `ozwatch.py --alerts-only`: only SHA-256 deal-ID notification fingerprints and timestamps are cached in `private_alert_state.json`; full RSS items, titles and the local dashboard are not cached, logged as new-deal content or uploaded to Pages. Cache prefix `state-v2-` stops restoring legacy caches containing raw private-watcher items. Previously created cache/log objects are not deleted by this change. The first run in the new mode silently establishes a baseline. Future runs select at most six new notifications. `NTFY_TOPIC` is the existing personal channel; no OzBargain content goes to the site's public topic. An unprotected ntfy topic is not an authenticated inbox; do not put sensitive information in it.
 
@@ -97,7 +97,7 @@ GitHub uses `ozwatch.py --alerts-only`: only SHA-256 deal-ID notification finger
 
 ## Used/refurbished tech, affiliate activation and project sharing
 
-`refurbished.html` provides nine official retailer/marketplace discovery sources, condition labels and practical purchase checks. The private watcher labels condition from the title (never assumes an unspecified item is new), matches lower-priced refurbished laptops and includes phones, tablets, audio, wearables, cameras and smart-home tech. It now rotates 46 retailer feeds: twelve runs per cycle, about 60 minutes at the five-minute Actions schedule or 180 minutes locally at 15 minutes, plus scan time/delays.
+`refurbished.html` provides nine official retailer/marketplace discovery sources, condition labels and practical purchase checks. The private watcher labels condition from the title (never assumes an unspecified item is new), matches lower-priced refurbished laptops and includes phones, tablets, audio, wearables, cameras and smart-home tech. It now rotates 47 retailer feeds: twelve runs per cycle, about 60 minutes at the five-minute Actions schedule or 180 minutes locally at 15 minutes, plus scan time/delays.
 
 `project.html` is a shareable development showcase with original social artwork, public-beta limitations, repository link, LinkedIn share button and copyable draft. This does not automatically post to LinkedIn.
 
@@ -139,3 +139,14 @@ The public tech directory now includes Computer Alliance, JW Computers, MSY, Mig
 The private watcher adds PS5 games, desktop/mini PCs, HDD/SSD/NAS storage and technology trade-in/buyback promotions. Rules still require community votes; only trade-in rules allow titles without a price. Failed phone deliveries and retailer alerts exceeding the per-run cap remain eligible for later attempts. The existing private topic and private owner settings are unchanged. Successful retailer deliveries are tracked using destination fingerprints so retrying a failed channel does not repeat the successful phone alert.
 
 Directory pages are generated from `tech_sources.json`, `refurb_sources.json` and `buyback_sources.json`; edit the manifests instead of duplicating cards in HTML. Retailer source feeds rotate with a shorter final batch before restarting the cycle. Unsupported or blocked feeds are reported, never bypassed.
+
+
+### Highest-payout buyback comparison
+
+`buyback_quotes.json` holds manually checked device-specific quotes with model/condition profiles, payout type, known fees, original source URL and check time. The buyback page sorts comparable AUD cash offers by net payout descending, followed by gift cards and purchase credit. Quotes older than 48 hours, invalid amounts and other device profiles cannot rank. Only the latest quote per buyer/payment type is used.
+
+The initial example is iPhone 14 Pro Max 256GB, working with light wear and battery below 80% (no other faults). On 5 October 2026, Mobile Guru showed $555 after its $105 battery deduction and Mobile Monster showed $530. These are provisional quotes, not completed sale prices or whole-market rankings. Mobile Guru's headline $820 and chart value $660 are not the matching final quote.
+
+Visitors can start a comparison for any other device and add their own matching quotes; those entries remain in browser storage. These inputs do not sell a device, submit personal information to a buyer, or activate automatic valuation monitoring. New provider/API connections are still needed for continuous all-device quote coverage. The public examples require manual rechecking and retain their original timestamps across builds.
+
+Run the comparison regression tests with `node --test tests/*.test.js`.
