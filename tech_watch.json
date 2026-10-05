@@ -43,6 +43,31 @@
       "pattern": "\\b(mirrorless|dslr|gopro|camera|doorbell|router|mesh wi-?fi|smart tv|oled tv)\\b",
       "exclude": "\\b(case|cover|screen protector|cable|mount)\\b",
       "minimum_price": 30
+    },
+    {
+      "name": "Desktop PCs",
+      "pattern": "\\b(desktop|gaming pc|mini pc|mini-pc|optiplex|thinkcentre|mac mini|imac)\\b",
+      "exclude": "\\b(case only|desk mat|wallpaper|mount)\\b",
+      "minimum_price": 75
+    },
+    {
+      "name": "Storage & hard drives",
+      "pattern": "\\b(hard drives?|hard disks?|hdd|ssd|nvme|nas|ironwolf|exos|wd elements|wd red|wd black|wd blue|sandisk extreme|seagate expansion)\\b",
+      "exclude": "\\b(enclosure|caddy|adapter|cable|dock|mount)\\b",
+      "minimum_price": 10
+    },
+    {
+      "name": "PS5 games",
+      "pattern": "\\b(ps5|playstation\\s*5)\\b",
+      "exclude": "\\b(console|controller|dualsense|headset|cover|stand|charg\\w*|skin|disc drive|ssd|nvme|portal|pro|slim|remote|cable|adapter)\\b",
+      "minimum_price": 0
+    },
+    {
+      "name": "Trade-in & buyback",
+      "pattern": "(?=.*\\b(trade[ -]?in|buy[ -]?back|sell your)\\b)(?=.*\\b(iphone|ipad|phone|samsung|pixel|galaxy|macbook|laptop|computer|console|ps5|playstation|xbox|device|devices|tablet|watch|camera|airpods)\\b)",
+      "exclude": "",
+      "minimum_price": 0,
+      "allow_no_price": true
     }
   ]
 }

@@ -35,6 +35,22 @@ class TechTests(unittest.TestCase):
         self.assertEqual(ozwatch.condition_label('Open-box iPad $399'),'Open-box / ex-demo')
         self.assertEqual(ozwatch.condition_label('Laptop $999'),'Condition not stated')
         self.assertIn('Laptops',ozwatch.tech_matches('[Refurb] ThinkPad $149',149,5))
+    def test_storage_and_desktop_coverage(self):
+        self.assertIn('Storage & hard drives',ozwatch.tech_matches('WD Elements 8TB External Hard Drive $199',199,5))
+        self.assertIn('Desktop PCs',ozwatch.tech_matches('Mini PC Intel N100 16GB $249',249,5))
+        self.assertNotIn('Storage & hard drives',ozwatch.tech_matches('USB HDD enclosure $39',39,5))
+
+    def test_ps5_games_are_separate_from_accessories(self):
+        matches=ozwatch.tech_matches('[PS5] Astro Bot Game $9',9,5)
+        self.assertIn('PS5 games',matches)
+        self.assertNotIn('Gaming accessories',matches)
+        self.assertNotIn('PS5 games',ozwatch.tech_matches('PS5 DualSense Controller $89',89,5))
+
+    def test_trade_in_offer_can_match_without_purchase_price(self):
+        matches=ozwatch.tech_matches('Bonus trade-in credit for iPhone and Samsung phones',None,5)
+        self.assertIn('Trade-in & buyback',matches)
+        self.assertEqual(ozwatch.tech_matches('Trade-in paperback books',None,5),[])
+
     def test_expiry_handles_naive_dates(self):
         self.assertTrue(ozwatch.is_expired(dict(title='PS5',expiry='2020-01-01T00:00:00'),datetime.now(timezone.utc)))
     def test_alert_mode_caches_no_content_and_deduplicates(self):
@@ -67,5 +83,13 @@ class TechTests(unittest.TestCase):
             with patch.object(ozwatch,'ALERTS_ONLY',True),patch.object(ozwatch,'ALERT_STATE',str(history)),patch.object(ozwatch,'FEEDS',['example']),patch.object(ozwatch,'rotated_stores',return_value=[]),patch.object(ozwatch,'fetch',side_effect=OSError('unavailable')):
                 with self.assertRaises(RuntimeError):ozwatch.run_once()
             self.assertEqual(history.read_text(),'{}')
+
+    def test_failed_phone_delivery_is_retried_next_run(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            history=Path(tmp)/'history.json'
+            history.write_text(json.dumps({ozwatch.alert_key('baseline'):ozwatch.time.time()}))
+            with patch.object(ozwatch,'ALERTS_ONLY',True), patch.object(ozwatch,'ALERT_STATE',str(history)), patch.object(ozwatch,'FEEDS',['example']), patch.object(ozwatch,'rotated_stores',return_value=[]), patch.object(ozwatch,'fetch',return_value=b'feed'), patch.object(ozwatch,'parse_feed',side_effect=lambda _: [deal()]), patch.object(ozwatch,'NTFY_TOPIC','test-topic'), patch('ozwatch.urllib.request.urlopen',side_effect=OSError('delivery failed')), contextlib.redirect_stdout(io.StringIO()):
+                ozwatch.run_once()
+            self.assertNotIn(ozwatch.alert_key(deal()['id']),json.loads(history.read_text()))
 
 if __name__=='__main__':unittest.main()

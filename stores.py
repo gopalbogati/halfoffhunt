@@ -13,11 +13,13 @@ New big hits (ALERT_PCT%+ or a likely price error) are pushed to:
   python3 stores.py --if-due 25      # only if the last scan was 25+ minutes ago
 Stdlib only.
 """
-import argparse, html, json, math, os, re, sys, time, urllib.parse, urllib.request
+import argparse, hashlib, html, json, math, os, re, sys, time, urllib.parse, urllib.request
 from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime, timezone
 
 import private_settings
+from pathlib import Path
+from urllib.error import HTTPError
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 SITE = os.path.join(HERE, "site")
@@ -29,6 +31,7 @@ ERROR_PCT = 90                               # "possible price error" badge (wit
 MAX_ALERTS_PER_RUN = 6
 MAX_PAGES = 4                                # x250 products per collection
 PER_STORE_CAP = 150
+STALE_MAX_AGE = 48 * 3600
 UA = {"User-Agent": "Mozilla/5.0 (compatible; deal-index; +https://github.com/)"}
 SETTINGS = private_settings.load(HERE)   # owner's push/quiet/off choice for private alerts
 
@@ -81,12 +84,17 @@ def scan_store(s, affs, now):
         return [], {"store": s["name"], "status": "unavailable", "reason": "AUD currency not confirmed", "count": 0}
     paths = [f"collections/{c}/products.json" for c in s["collections"]] or ["products.json"]
     seen, out, failures = set(), [], 0
+    limited = False
     for path in paths:
         for page in range(1, MAX_PAGES + 1):
             try:
-                prods = get_json(f"https://{s['domain']}/{path}?limit=250&page={page}").get("products", [])
+                payload = get_json(f"https://{s['domain']}/{path}?limit=250&page={page}")
+                if not isinstance(payload, dict) or not isinstance(payload.get("products"), list):
+                    raise ValueError("Invalid product feed")
+                prods = payload["products"]
             except Exception as e:
                 failures += 1
+                limited = isinstance(e, HTTPError) and e.code == 429
                 print(f"  ! {s['name']} {path} p{page}: {e}", file=sys.stderr)
                 break
             if not prods:
@@ -121,8 +129,28 @@ def scan_store(s, affs, now):
             if len(prods) < 250:
                 break
             time.sleep(0.4)
+        if limited:
+            break  # Respect the retailer's rate limit; do not try other collections.
     out.sort(key=lambda d: -d["pct"])
-    return out[:PER_STORE_CAP], {"store": s["name"], "status": "partial" if failures else "ok", "count": min(len(out), PER_STORE_CAP), "checked_at": now}
+    status = {"store": s["name"], "status": "partial" if failures else "ok", "count": min(len(out), PER_STORE_CAP), "checked_at": now}
+    status['_observed_ids'] = [f"{s['domain']}:{i}" for i in seen]
+    if failures:
+        status["reason"] = "Rate limited by retailer" if limited else "Product feed unavailable or incomplete"
+    return out[:PER_STORE_CAP], status
+
+
+def merge_previous(current, statuses, previous, now):
+    """Keep recent prices only for failed sources; never renew their check time."""
+    failed = {s["store"] for s in statuses if s["status"] != "ok"}
+    seen = {d["id"] for d in current}
+    seen.update(i for s in statuses for i in s.get('_observed_ids', []))
+    retained = []
+    for d in previous:
+        checked = d.get("checked_at", 0)
+        if (d.get("store") in failed and d.get("id") not in seen
+                and isinstance(checked, (int, float)) and 0 <= now - checked <= STALE_MAX_AGE):
+            retained.append(dict(d, stale=True))
+    return current + retained
 
 
 def scan_safely(store, affs, now):
@@ -137,32 +165,59 @@ def post(url, data, headers=None):
     try:
         req = urllib.request.Request(url, data=data, headers=headers or {}, method="POST")
         urllib.request.urlopen(req, timeout=15).read()
+        return True
     except Exception as e:
-        print("  ! alert:", e, file=sys.stderr)
+        print("  ! alert delivery failed; will retry on a later scan", file=sys.stderr)
+        return False
 
 
-def alert(d):
+def alert(d, receipts=None):
+    receipts = set() if receipts is None else receipts
+    def deliver(url, data, headers=None):
+        key = hashlib.sha256(url.encode()).hexdigest()
+        if key in receipts:
+            return True
+        if post(url, data, headers):
+            receipts.add(key)
+            return True
+        return False
     head = ("POSSIBLE PRICE ERROR: " if d["error"] else "") + f"{d['pct']}% off at {d['store']}"
     body = f"{d['title']} - ${d['price']:,.2f} (was ${d['was']:,.2f})"
     loud = "5" if d["error"] else "4"
     private_mode = SETTINGS["modes"].get("store_deals", "push")
     targets = []
+    delivered = []
     if os.environ.get("NTFY_TOPIC") and private_mode != "off":
         targets.append((os.environ["NTFY_TOPIC"], private_settings.QUIET_PRIORITY if private_mode == "quiet" else loud))
     public = os.environ.get("PUBLIC_NTFY_TOPIC") or CONFIG.get("public_ntfy_topic")
     if public:
         targets.append((public, loud))   # the public follower channel is not affected by private settings
     for topic, priority in targets:
-        post(f"https://ntfy.sh/{topic}", body.encode(), {
+        delivered.append(deliver(f"https://ntfy.sh/{topic}", body.encode(), {
             "Title": head.encode("ascii", "ignore").decode(), "Click": d["url"],
-            "Priority": priority, "Tags": "rotating_light" if d["error"] else "tag"})
+            "Priority": priority, "Tags": "rotating_light" if d["error"] else "tag"}))
     tok, chat = os.environ.get("TELEGRAM_BOT_TOKEN"), os.environ.get("TELEGRAM_CHAT_ID")
     if tok and chat:
         msg = f"<b>{html.escape(head)}</b>\n{html.escape(body)}\n<a href=\"{html.escape(d['url'])}\">View deal</a>"
         if CONFIG.get("affiliate_disclosure_in_posts") and d.get("affiliate", False):
             msg += "\n#ad"
-        post(f"https://api.telegram.org/bot{tok}/sendMessage", urllib.parse.urlencode(
-            {"chat_id": chat, "text": msg, "parse_mode": "HTML", "disable_web_page_preview": "false"}).encode())
+        delivered.append(deliver(f"https://api.telegram.org/bot{tok}/sendMessage?chat_id={urllib.parse.quote(chat, safe='')}", urllib.parse.urlencode(
+            {"chat_id": chat, "text": msg, "parse_mode": "HTML", "disable_web_page_preview": "false"}).encode()))
+    return bool(delivered) and all(delivered)
+
+
+def send_alerts(candidates, alerted, now, first_run, pending=None):
+    pending = {} if pending is None else pending
+    if first_run:
+        alerted.update({d['id']: now for d in candidates})  # silent initial baseline
+        return
+    for d in sorted(candidates, key=lambda d: (bool(pending.get(d['id'])), -d['error'], -d['pct']))[:MAX_ALERTS_PER_RUN]:
+        receipts = set(pending.get(d['id'], []))
+        if alert(d, receipts):
+            alerted[d['id']] = now
+            pending.pop(d['id'], None)
+        elif receipts:
+            pending[d['id']] = sorted(receipts)
 
 
 def write_feed(deals, now):
@@ -188,7 +243,7 @@ def main():
         state = json.load(open(STATE))
     except Exception:
         state = {"last": 0, "first_seen": {}, "alerted": {}}
-    if a.if_due and time.time() - state["last"] < a.if_due * 60:
+    if a.if_due and time.time() - state["last"] < a.if_due * 60 and Path(SITE, "data", "deals.json").exists():
         print("stores: not due yet"); return
     try:
         affs = json.load(open(os.path.join(HERE, "affiliates.json"))).get("templates", {})
@@ -198,7 +253,7 @@ def main():
     now = time.time()
     deals, ok = [], 0
     statuses = []
-    with ThreadPoolExecutor(max_workers=6) as pool:
+    with ThreadPoolExecutor(max_workers=3) as pool:
         results = pool.map(lambda s: scan_safely(s, affs, now), stores)
         for s, (got, status) in zip(stores, results):
             statuses.append(status)
@@ -206,29 +261,37 @@ def main():
             deals += got
             print(f"  {s['name']}: {len(got)} ({status['status']})")
     # A network-wide failure must not replace the last good publication with empty data.
-    if not any(s["status"] == "ok" for s in statuses):
+    publication = Path(SITE, "data", "deals.json")
+    try:
+        previous = json.loads(publication.read_text())["deals"]
+    except (OSError, ValueError, KeyError):
+        previous = []
+    deals = merge_previous(deals, statuses, previous, now)
+    for status in statuses:
+        status.pop('_observed_ids', None)
+    if not any(s["status"] == "ok" for s in statuses) and not deals:
         raise RuntimeError("No complete store scans; keeping the last published data")
     fs, al = state["first_seen"], state["alerted"]
     first_run = not fs
     fresh = []
     for d in deals:
         d["first_seen"] = fs.setdefault(d["id"], now)
-        if (d["pct"] >= ALERT_PCT or d["error"]) and d["id"] not in al:
-            al[d["id"]] = now
+        if not d.get("stale") and (d["pct"] >= ALERT_PCT or d["error"]) and d["id"] not in al:
             fresh.append(d)
-    if not first_run:   # best few only, so followers aren't flooded
-        for d in sorted(fresh, key=lambda d: (-d["error"], -d["pct"]))[:MAX_ALERTS_PER_RUN]:
-            alert(d)
+    pending = state.setdefault('pending_deliveries', {})
+    send_alerts(fresh, al, now, first_run, pending)
     live = {d["id"] for d in deals}
+    state['pending_deliveries'] = {k:v for k,v in pending.items() if k in live and k not in al}
     state["first_seen"] = {k: v for k, v in fs.items() if k in live or now - v < 14 * 86400}
     state["alerted"] = {k: v for k, v in al.items() if now - v < 14 * 86400}
     state["last"] = now
     deals.sort(key=lambda d: (-d["error"], -d["pct"]))
     os.makedirs(os.path.join(SITE, "data"), exist_ok=True)
     json.dump({"updated": datetime.now(timezone.utc).isoformat(timespec="seconds"),
+               "degraded": ok < len(stores), "stale_count": sum(bool(d.get("stale")) for d in deals),
                "stores": sorted({s["name"] for s in stores}), "sources": statuses, "count": len(deals), "deals": deals},
               open(os.path.join(SITE, "data", "deals.json"), "w"), separators=(",", ":"))
-    write_feed(deals, now)
+    write_feed([d for d in deals if not d.get("stale")], now)
     json.dump(state, open(STATE, "w"))
     open(os.path.join(HERE, ".scanned"), "w").close()   # tells the workflow to redeploy the site
     print(f"stores: {len(deals)} deals at {MIN_PCT}%+ off from {ok}/{len(stores)} stores")

@@ -2,7 +2,8 @@
  - featured strip + prerendered grid on the home page (JS takes over for filtering)
  - /sale/<category>.html and /sale/<store>.html landing pages with Product JSON-LD
 """
-import html, json, os, re
+import html, json, os, re, time
+from datetime import datetime, timezone
 
 CATS = ["Tech", "Shoes", "Fashion", "Home & Kitchen", "Beauty", "Outdoors", "Travel", "Marketplace"]
 e = html.escape
@@ -29,12 +30,14 @@ def share_attrs(d):
 def card(d, prefix=""):
     img = f'<img src="{e(d["img"])}" alt="{e(d["title"])}" loading="lazy" decoding="async">' if d.get("img") else ""
     brand = f'{e(d["brand"])} · ' if d.get("brand") and d["brand"] != d["store"] else ""
-    flag = '<span class="flag">Possible error</span>' if d.get("error") else ""
+    flag = '<span class="flag">Awaiting recheck</span>' if d.get("stale") else '<span class="flag">Possible error</span>' if d.get("error") else ""
+    checked = datetime.fromtimestamp(d.get('checked_at', 0), timezone.utc).strftime('%d %b %Y %H:%M UTC')
     return (f'<article class="card{" error" if d.get("error") else ""}"><a class="deal-link" href="{e(d["url"])}" target="_blank" rel="noopener sponsored">'
             f'<div class="ph">{img}<span class="pct">-{d["pct"]}%</span>{flag}</div>'
             f'<div class="info"><div class="meta">{brand}{e(d["store"])}</div><div class="title">{e(d["title"])}</div>'
             f'<div class="prices"><span class="now">{aud(d["price"])}</span><span class="was">{aud(d["was"])}</span>'
-            f'<span class="save">Save {aud(round(d["was"] - d["price"]))}</span></div></div></a>'
+            f'<span class="save">Save {aud(round(d["was"] - d["price"]))}</span></div>'
+            f'<p class="small">{"Previous price · verify stock and price. " if d.get("stale") else ""}Checked {checked}</p></div></a>'
             f'<div class="card-actions"><button class="ghost" type="button" {share_attrs(d)}>Share</button></div></article>')
 
 
@@ -70,7 +73,7 @@ PAGE = """<!doctype html><html lang="en-AU"><head><meta charset="utf-8"><meta na
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="../style.css">{ld}</head><body>
 <header class="top slim"><div class="wrap nav"><a class="logo" href="../"><span class="mark">½</span>{brand}</a><nav><a href="../">All deals</a><a href="../#alerts">Get alerts</a></nav></div>
-<div class="wrap hero"><p class="eyebrow">{count} live deals · updated every 30 minutes</p><h1>{h1}</h1><p class="lede">{lede}</p>
+<div class="wrap hero"><p class="eyebrow">{count} listed deals · check each price timestamp</p><h1>{h1}</h1><p class="lede">{lede}</p><p>Scans are scheduled every 30 minutes and may be delayed. Previous prices are marked; confirm stock and price at checkout.</p>
 <p><a class="btn light" href="../?{q}">Filter &amp; search these deals</a></p></div></header>
 <main class="wrap"><div class="grid" style="margin-top:24px">{cards}</div>{more}{links}</main>
 <footer class="foot"><div class="wrap"><p>Prices come from each store's public product data and can change or sell out; the store's checkout price is final. Some links may be affiliate links. <a href="../about.html#disclosure">Disclosure</a> · <a href="../privacy.html">Privacy</a></p></div></footer>
@@ -82,7 +85,9 @@ def build(site, cfg):
     if not os.path.exists(path):
         return []
     data = json.load(open(path))
-    deals = data["deals"]
+    now = time.time()
+    deals = [dict(d, stale=d.get('stale', False) or now - d.get('checked_at', 0) > 2 * 3600)
+             for d in data["deals"] if 0 <= now - d.get('checked_at', 0) <= 48 * 3600]
     base = cfg["site_url"].rstrip("/")
     global BASE
     BASE = base
@@ -104,12 +109,12 @@ def build(site, cfg):
         if kind == "cat":
             title = f"{name} sale: 50%+ off in Australia right now | {cfg['brand']}"
             h1 = f"{e(name)} at half price or less"
-            lede = f"{len(items)} in-stock {e(name.lower())} deals at 50% off or more from Australian stores, up to {best}% off. Checked every 30 minutes."
+            lede = f"{len(items)} {e(name.lower())} listings last seen at 50% off or more from Australian stores, up to {best}% off. Verify current availability."
             q = "cat=" + name.replace("&", "%26").replace(" ", "+")
         else:
             title = f"{name} sale: {len(items)} items 50%+ off | {cfg['brand']}"
             h1 = f"{e(name)} sale, 50%+ off"
-            lede = f"{len(items)} in-stock items at {e(name)} marked down 50% or more, up to {best}% off. Prices checked every 30 minutes."
+            lede = f"{len(items)} items at {e(name)} last seen marked down 50% or more, up to {best}% off. Verify current availability."
             q = "store=" + name.replace("&", "%26").replace(" ", "+")
         more = (f'<div class="more"><a class="btn" href="../?{q}">See all {len(items)} deals</a></div>' if len(items) > 60 else "")
         links = (f'<section class="browse"><h2>Browse by category</h2><div class="chips wrapchips">{cat_links}</div>'
@@ -117,14 +122,14 @@ def build(site, cfg):
         ogimg = f'<meta property="og:image" content="{e(items[0]["img"])}">' if items[0].get("img") else ""
         page = PAGE.format(title=e(title), desc=e(lede), url=url, brand=brand, h1=h1, lede=lede, q=q, ogimg=ogimg,
                            count=len(items), cards="".join(card(d) for d in items[:60]), more=more, links=links,
-                           ld=jsonld(items, url, title))
+                           ld=jsonld([d for d in items if not d.get('stale')], url, title))
         open(os.path.join(site, fn), "w").write(page)
         made.append(fn)
 
     # home page: featured strip, category tiles, prerendered first grid
     idx = os.path.join(site, "index.html")
     s = open(idx).read()
-    feat = top_picks([d for d in deals if d["price"] >= 20 and not d["error"] and d["cat"] != "Marketplace"], 8)
+    feat = top_picks([d for d in deals if not d.get('stale') and d["price"] >= 20 and not d["error"] and d["cat"] != "Marketplace"], 8)
     tiles = []
     for k, c, l in groups:
         if k != "cat" or not l:

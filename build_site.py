@@ -5,6 +5,7 @@ from datetime import date
 from affiliate_links import rewrite_html
 from pathlib import Path
 from urllib.parse import quote
+from directory import render as render_directory
 HERE = os.path.dirname(os.path.abspath(__file__))
 cfg = json.load(open(os.path.join(HERE, "site_config.json")))
 affiliates = json.loads(Path(HERE, "affiliates.json").read_text())
@@ -14,6 +15,10 @@ vals = {"brand": cfg["brand"], "tagline": cfg["tagline"], "site_url": cfg["site_
 vals["project_share_url"] = quote(vals["site_url"] + "/project.html", safe="")
 src, out = os.path.join(HERE, "site_src"), os.path.join(HERE, "site")
 os.makedirs(out, exist_ok=True)
+os.makedirs(os.path.join(out, "data"), exist_ok=True)
+quotes = json.loads(Path(HERE, "buyback_quotes.json").read_text())
+quotes['providers'] = json.loads(Path(HERE, "buyback_sources.json").read_text())['stores']
+Path(out, "data", "buyback.json").write_text(json.dumps(quotes, separators=(',', ':')))
 for name in os.listdir(src):
     p = os.path.join(src, name)
     if name.endswith((".html", ".js", ".css", ".svg", ".txt", ".xml")):
@@ -21,8 +26,11 @@ for name in os.listdir(src):
         for k, v in vals.items():
             s = s.replace("{{" + k + "}}", v)
         if name.endswith(".html"):
+            manifest = {"tech.html": "tech_sources.json", "refurbished.html": "refurb_sources.json", "buyback.html": "buyback_sources.json"}.get(name)
+            if manifest:
+                s = render_directory(s, json.loads(Path(HERE, manifest).read_text())["stores"])
             s = rewrite_html(s, affiliates)
-            for asset in ("app.js", "tech.js", "share.js", "share-deal.js", "style.css"):
+            for asset in ("app.js", "tech.js", "buyback.js", "share.js", "share-deal.js", "style.css"):
                 digest = hashlib.sha256(open(os.path.join(src, asset), "rb").read()).hexdigest()[:12]
                 s = s.replace(f'"{asset}"', f'"{asset}?v={digest}"')
         open(os.path.join(out, name), "w").write(s)
@@ -33,7 +41,7 @@ import pages as P
 CLEAN = "pages.dev" in vals["site_url"] or cfg.get("clean_urls", False)
 def clean(p):
     return p[:-5] if CLEAN and p.endswith(".html") else p
-pages = ["", "about.html", "privacy.html", "stores.html", "submit.html", "terms.html", "tech.html", "private-alerts.html", "refurbished.html", "project.html"] + P.build(out, cfg)
+pages = ["", "about.html", "privacy.html", "stores.html", "submit.html", "terms.html", "tech.html", "private-alerts.html", "refurbished.html", "buyback.html", "project.html"] + P.build(out, cfg)
 open(os.path.join(out, "sitemap.xml"), "w").write('<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' +
     "".join(f"<url><loc>{vals['site_url']}/{clean(p)}</loc></url>" for p in pages) + "</urlset>")
 

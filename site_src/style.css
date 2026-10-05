@@ -123,3 +123,6 @@ code{font:600 14px ui-monospace,Menlo,monospace;background:var(--chip);padding:6
 .browse{margin-top:48px}.browse h2{font:800 22px/1.2 "Bricolage Grotesque",Inter,sans-serif;margin:24px 0 10px}
 .wrapchips{flex-wrap:wrap;overflow:visible}
 .wrapchips .chip{text-decoration:none}
+
+/* Buyback comparisons */
+.quote-value{font-size:2rem;font-weight:800;margin:.4rem 0}.best-quote{border:2px solid #087448}.quote-form{display:grid;gap:10px;max-width:620px;padding:18px 0}.quote-form input,.quote-form select,#quote-profile{font:inherit;border:1px solid #ccc;border-radius:10px;padding:12px;max-width:100%;min-width:0}.quote-form .quote-confirm{display:flex;align-items:flex-start;gap:10px}.quote-confirm input{margin-top:4px}#quote-comparison details{border-top:1px solid #ddd;padding:16px 0}#quote-comparison summary{cursor:pointer;font-weight:600}#quote-comparison{margin:28px 0 40px}.quote-card h3{font-size:1.3rem;margin:.4rem 0}
