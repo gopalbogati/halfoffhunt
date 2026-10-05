@@ -73,6 +73,33 @@
       "payout": "Bank transfer after assessment",
       "note": "Supports phones, computers, watches and gaming devices. Match condition and battery deductions before comparing quotes.",
       "mode": "direct_link"
+    },
+    {
+      "name": "CeX Australia",
+      "domain": "au.webuy.com",
+      "url": "https://au.webuy.com/",
+      "categories": [
+        "PS5 games",
+        "PS5 & gaming",
+        "Phones & tablets",
+        "Laptops",
+        "Desktop PCs"
+      ],
+      "payout": "Cash / bank payment or CeX voucher",
+      "note": "Compare the exact item\u2019s cash buy-in and voucher prices. Final offer depends on testing, condition and seller eligibility.",
+      "mode": "direct_link"
+    },
+    {
+      "name": "EB Games Trade-in",
+      "domain": "ebgames.com.au",
+      "url": "https://www.ebgames.com.au/trade-and-save/what-can-i-trade",
+      "categories": [
+        "PS5 games",
+        "PS5 & gaming"
+      ],
+      "payout": "Trade-in offer \u00b7 confirm cash or credit in store",
+      "note": "Eligible physical games, consoles and accessories. Confirm the title, condition, offer terms and payment type before comparing the return.",
+      "mode": "direct_link"
     }
   ]
 }
