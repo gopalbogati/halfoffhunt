@@ -1,0 +1,63 @@
+{
+  "checked_on": "2026-10-05",
+  "note": "Official quote links; no guaranteed valuation or automatic quote comparison.",
+  "stores": [
+    {
+      "name": "Apple Trade In",
+      "domain": "apple.com",
+      "url": "https://www.apple.com/au/shop/trade-in",
+      "categories": [
+        "Phones & tablets",
+        "Laptops",
+        "Audio & wearables"
+      ],
+      "payout": "Purchase credit / Apple Gift Card",
+      "note": "Eligible Apple devices; value depends on model and condition. Recycling may be offered when no credit is available.",
+      "mode": "direct_link"
+    },
+    {
+      "name": "JB Hi-Fi Trade-in",
+      "domain": "jbhifi.com.au",
+      "url": "https://www.jbhifi.com.au/pages/tradein",
+      "categories": [
+        "Phones & tablets",
+        "Laptops",
+        "PS5 & gaming",
+        "Cameras & smart home",
+        "Audio & wearables"
+      ],
+      "payout": "JB Hi-Fi eGift Card",
+      "note": "Check eligible devices, return deadline and assessment terms. A gift card is not a cash payment.",
+      "mode": "direct_link"
+    },
+    {
+      "name": "Mobile Monster",
+      "domain": "mobilemonster.com.au",
+      "url": "https://mobilemonster.com.au/sell-your-device",
+      "categories": [
+        "Phones & tablets",
+        "Laptops",
+        "PS5 & gaming",
+        "Audio & wearables"
+      ],
+      "payout": "Cash payment after assessment",
+      "note": "Get a model-and-condition quote for supported phones, Macs and other devices; check payment method and final assessment.",
+      "mode": "direct_link"
+    },
+    {
+      "name": "Cash Converters",
+      "domain": "cashconverters.com.au",
+      "url": "https://www.cashconverters.com.au/sell",
+      "categories": [
+        "Phones & tablets",
+        "Laptops",
+        "Desktop PCs",
+        "PS5 & gaming",
+        "Cameras & smart home"
+      ],
+      "payout": "Cash sale in store",
+      "note": "Request an outright-sale quote for supported computers, phones, cameras and consoles. Value depends on inspection and local demand.",
+      "mode": "direct_link"
+    }
+  ]
+}

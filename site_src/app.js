@@ -4,6 +4,7 @@
   const CATS = ["Tech", "Shoes", "Fashion", "Home & Kitchen", "Beauty", "Outdoors", "Travel", "Marketplace"];
   const state = { cat: "all", q: "", store: "", max: "", sort: "mix", shown: PAGE, saved: false };
   let deals = [];
+  let degraded = false;
   let saved = new Set();
   try { const ids = JSON.parse(localStorage.getItem("hoh-saved") || "[]"); if (Array.isArray(ids)) saved = new Set(ids.filter(x => typeof x === "string")); } catch {}
   const safeUrl = (value) => { try { const u = new URL(value); return u.protocol === "https:" ? u.href : ""; } catch { return ""; } };
@@ -63,13 +64,13 @@
     return `<article class="card${d.error ? " error" : ""}"><a class="deal-link" href="${esc(safeUrl(d.url))}" target="_blank" rel="noopener noreferrer${d.affiliate ? " sponsored" : ""}">
       <div class="ph">${safeUrl(d.img) ? `<img src="${esc(safeUrl(d.img))}" alt="" loading="lazy" decoding="async">` : ""}
         <span class="pct">-${d.pct}%</span>${fresh ? '<span class="new">NEW</span>' : ""}
-        ${d.error ? '<span class="flag">Possible error</span>' : ""}</div>
+        ${d.stale ? '<span class="flag">Awaiting recheck</span>' : d.error ? '<span class="flag">Possible error</span>' : ""}</div>
       <div class="info">
         <div class="meta">${esc(d.brand && d.brand !== d.store ? d.brand + " · " : "")}${esc(d.store)}</div>
         <div class="title">${esc(d.title)}${d.variant ? ` <span class="meta">(${esc(d.variant)})</span>` : ""}</div>
         <div class="prices"><span class="now">${aud(d.price)}</span><span class="was">${aud(d.was)}</span>
         <span class="save">Save ${aud(Math.round((d.was - d.price) * 100) / 100)}</span></div>
-        <p class="small">Retailer’s “was” price · delivery extra unless stated</p>
+        <p class="small">${d.stale ? 'Previous price · stock and price need rechecking' : 'Retailer’s “was” price · delivery extra unless stated'}</p>
         ${d.checked_at ? `<span class="meta">Checked ${ago(d.checked_at * 1000)}</span>` : ""}
       </div></a><div class="card-actions"><button class="ghost" data-save="${esc(d.id)}" aria-pressed="${saved.has(d.id)}">${saved.has(d.id) ? "♥ Saved" : "♡ Save"}</button><button class="ghost" data-share="${esc(d.id)}">Share</button></div></article>`;
   }
@@ -78,7 +79,9 @@
     const list = filtered();
     $("#grid").innerHTML = list.length
       ? list.slice(0, state.shown).map(card).join("")
-      : '<div class="empty">No deals match those filters right now. Try clearing filters or browsing the store directory.</div>';
+      : degraded && !deals.length
+        ? '<div class="empty"><h3>Retailer feeds are temporarily unavailable</h3><p>This does not mean there are no sales. Browse <a href="tech.html">tech and PS5 offers</a>, <a href="refurbished.html">used and refurbished tech</a>, <a href="buyback.html">trade-in and buyback services</a> or <a href="stores.html">all stores</a> directly while scans recover.</p></div>'
+        : '<div class="empty">No deals match those filters right now. Try clearing filters or browsing the store directory.</div>';
     $("#more").hidden = list.length <= state.shown;
     $("#result").textContent = `${list.length.toLocaleString()} deal${list.length === 1 ? "" : "s"}` +
       (state.cat !== "all" ? ` in ${state.cat === "errors" ? "possible pricing errors" : state.cat}` : "") +
@@ -138,13 +141,17 @@
       if (!r.ok) throw new Error("Unavailable feed");
       const data = await r.json();
       if (!Array.isArray(data.deals)) throw new Error("Invalid feed");
-      deals = data.deals.filter(d => safeUrl(d.url) && Number.isFinite(d.price) && Number.isFinite(d.was));
+      deals = data.deals.filter(d => safeUrl(d.url) && Number.isFinite(d.price) && Number.isFinite(d.was) && Date.now() / 1000 - d.checked_at <= 48 * 3600)
+        .map(d => ({...d, stale: Boolean(d.stale) || Date.now() / 1000 - d.checked_at > 2 * 3600}));
       const age = Date.now() - new Date(data.updated).getTime();
-      $("#notice").textContent = age > 2 * 3600000 ? "Updates are delayed. These prices were last checked " + ago(data.updated) + "; verify at checkout." : "Prices in AUD. Discounts use the retailer’s comparison price, not a verified historical low.";
+      document.querySelector('.featured').hidden = !deals.length || age > 2 * 3600000;
+      document.querySelector('[aria-labelledby="t-h"]').hidden = !deals.length || age > 48 * 3600000;
       const sources = data.sources || [];
-      $("#source-status").textContent = sources.length ? `${sources.filter(s => s.status === "ok").length} of ${sources.length} feeds completed the last scan. Unavailable feeds are not listed as current deals.` : "Feed-level status will appear after the next scan.";
+      degraded = data.degraded || sources.some(s => s.status !== "ok");
+      $("#notice").textContent = degraded ? "Some retailer feeds are unavailable. Prices marked ‘Awaiting recheck’ are previous results, kept for up to 48 hours. Confirm price and stock at the retailer." : age > 2 * 3600000 ? "Updates are delayed. Last scan " + ago(data.updated) + "; verify prices at checkout." : "Prices in AUD. Discounts use the retailer’s comparison price, not a verified historical low.";
+      $("#source-status").textContent = sources.length ? `${sources.filter(s => s.status === "ok").length} of ${sources.length} feeds completed the last scan. ${deals.filter(d => d.stale).length} previous prices awaiting recheck. Scheduled runs can be delayed.` : "Feed-level status will appear after the next scan.";
 
-      $("#s-count").textContent = data.count.toLocaleString();
+      $("#s-count").textContent = deals.length.toLocaleString();
       $("#s-stores").textContent = data.stores.length;
       $("#s-best").textContent = deals.length ? "-" + Math.max(...deals.map((d) => d.pct)) + "%" : "–";
       $("#s-updated").textContent = ago(data.updated);
@@ -152,6 +159,7 @@
         [...new Set(deals.map((d) => d.store))].sort().map((s) => `<option>${esc(s)}</option>`).join("");
       chips(); bind(); render();
     } catch (e) {
+      document.querySelectorAll('.featured, .tiles').forEach(el => el.hidden = true);
       $("#grid").innerHTML = '<div class="empty">The deal feed is unavailable. <button id="retry">Try again</button> or <a href="stores.html">browse stores directly</a>.</div>';
       $("#retry").onclick = load;
     }

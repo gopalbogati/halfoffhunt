@@ -13,7 +13,8 @@
         "Tech",
         "Phones & tablets",
         "Audio & wearables",
-        "Cameras & smart home"
+        "Cameras & smart home",
+        "PS5 games"
       ],
       "note": "Browse Amazon deals; check seller, delivery and Prime requirements.",
       "mode": "direct_link",
@@ -29,7 +30,8 @@
         "Tech",
         "Phones & tablets",
         "Audio & wearables",
-        "Cameras & smart home"
+        "Cameras & smart home",
+        "PS5 games"
       ],
       "note": "Compare the exact console bundle or laptop configuration.",
       "mode": "direct_link",
@@ -101,7 +103,9 @@
       "categories": [
         "Laptops",
         "PC parts",
-        "Tech"
+        "Tech",
+        "Desktop PCs",
+        "Storage & hard drives"
       ],
       "note": "Check clearance condition, stock and warranty.",
       "mode": "direct_link",
@@ -114,7 +118,9 @@
       "categories": [
         "Laptops",
         "PC parts",
-        "Tech"
+        "Tech",
+        "Desktop PCs",
+        "Storage & hard drives"
       ],
       "note": "Read coupon exclusions and expiry before checkout.",
       "mode": "direct_link",
@@ -126,7 +132,9 @@
       "url": "https://www.pccasegear.com/specials",
       "categories": [
         "PC parts",
-        "Tech"
+        "Tech",
+        "Desktop PCs",
+        "Storage & hard drives"
       ],
       "note": "Compare the exact component model and shipping.",
       "mode": "direct_link",
@@ -139,7 +147,9 @@
       "categories": [
         "Laptops",
         "PC parts",
-        "Tech"
+        "Tech",
+        "Desktop PCs",
+        "Storage & hard drives"
       ],
       "note": "Confirm online stock and collection availability.",
       "mode": "direct_link",
@@ -164,7 +174,9 @@
       "categories": [
         "Laptops",
         "PC parts",
-        "Tech"
+        "Tech",
+        "Desktop PCs",
+        "Storage & hard drives"
       ],
       "note": "Retailer catalogue; check online availability and delivery.",
       "mode": "direct_link",
@@ -175,7 +187,8 @@
       "domain": "ebgames.com.au",
       "url": "https://www.ebgames.com.au/featured/playstation-5",
       "categories": [
-        "PS5 & gaming"
+        "PS5 & gaming",
+        "PS5 games"
       ],
       "note": "Distinguish new, preowned, refurbished and trade-in offers.",
       "mode": "direct_link",
@@ -191,11 +204,94 @@
         "Tech",
         "Phones & tablets",
         "Audio & wearables",
-        "Cameras & smart home"
+        "Cameras & smart home",
+        "PS5 games"
       ],
       "note": "Check marketplace seller, import status and membership pricing.",
       "mode": "direct_link",
       "private_feed": "https://www.ozbargain.com.au/deals/kogan.com/feed"
+    },
+    {
+      "name": "Computer Alliance",
+      "domain": "computeralliance.com.au",
+      "url": "https://www.computeralliance.com.au/see-more/specials/",
+      "categories": [
+        "Laptops",
+        "Desktop PCs",
+        "PC parts",
+        "Storage & hard drives"
+      ],
+      "note": "Specials from an Australian computer retailer. Compare exact specifications and delivery.",
+      "mode": "direct_link",
+      "private_feed": "https://www.ozbargain.com.au/deals/computeralliance.com.au/feed",
+      "checked_on": "2026-10-05"
+    },
+    {
+      "name": "JW Computers",
+      "domain": "jw.com.au",
+      "url": "https://www.jw.com.au/ex-demo",
+      "categories": [
+        "Laptops",
+        "Desktop PCs",
+        "PC parts",
+        "Storage & hard drives"
+      ],
+      "note": "Ex-demo clearance: check condition, accessories and warranty.",
+      "mode": "direct_link",
+      "private_feed": "https://www.ozbargain.com.au/deals/jw.com.au/feed",
+      "checked_on": "2026-10-05"
+    },
+    {
+      "name": "MSY",
+      "domain": "msy.com.au",
+      "url": "https://www.msy.com.au/",
+      "categories": [
+        "Desktop PCs",
+        "PC parts",
+        "Storage & hard drives"
+      ],
+      "note": "Compare component and storage prices, stock location and shipping. Catalogue prices are not all sale prices.",
+      "mode": "direct_link",
+      "private_feed": "https://www.ozbargain.com.au/deals/msy.com.au/feed",
+      "checked_on": "2026-10-05"
+    },
+    {
+      "name": "Mighty Ape AU",
+      "domain": "mightyape.com.au",
+      "url": "https://www.mightyape.com.au/ma/shop/category/games/playstation/ps5/ps5-games/",
+      "categories": [
+        "PS5 & gaming",
+        "PS5 games"
+      ],
+      "note": "Physical PS5 games. Check seller, shipping and any membership offer.",
+      "mode": "direct_link",
+      "private_feed": "https://www.ozbargain.com.au/deals/mightyape.com.au/feed",
+      "checked_on": "2026-10-05"
+    },
+    {
+      "name": "PlayStation Store AU",
+      "domain": "playstation.com",
+      "url": "https://store.playstation.com/en-au/category/4cbf39e2-5749-4970-ba81-93a489e4570c/1",
+      "categories": [
+        "PS5 & gaming",
+        "PS5 games"
+      ],
+      "note": "Digital PS5 games. Check edition, Australian account compatibility and PlayStation Plus requirements.",
+      "mode": "direct_link",
+      "private_feed": "https://www.ozbargain.com.au/deals/playstation.com/feed",
+      "checked_on": "2026-10-05"
+    },
+    {
+      "name": "PLE Storage",
+      "domain": "ple.com.au",
+      "url": "https://www.ple.com.au/Categories/724/Hard-Drives-and-SSDs-External",
+      "categories": [
+        "Storage & hard drives"
+      ],
+      "note": "External hard drives and SSDs. Compare capacity, connection, warranty and delivery.",
+      "mode": "direct_link",
+      "private_feed": "https://www.ozbargain.com.au/deals/ple.com.au/feed",
+      "checked_on": "2026-10-05"
     }
   ]
 }

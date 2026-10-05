@@ -1,7 +1,7 @@
 name: deals
 on:
   schedule:
-    - cron: "*/5 * * * *"      # GitHub may delay scheduled runs by a few minutes at busy times
+    - cron: "3-58/5 * * * *"   # Best effort; GitHub can delay/drop runs, sometimes by hours.
   push:
     branches: [main]
   workflow_dispatch:
@@ -37,7 +37,9 @@ jobs:
           path.write_text(json.dumps(cfg, indent=2) + '\n')
           PYCONFIG
       - name: Test scanner
-        run: python3 -m unittest discover -s tests -v
+        run: |
+          python3 -m unittest discover -s tests -v
+          for file in site_src/*.js; do node --check "$file"; done
       - name: Restore state
         uses: actions/cache/restore@v4
         with:
@@ -49,6 +51,8 @@ jobs:
             site/feed.xml
           key: state-v2-none
           restore-keys: state-v2-
+      - name: Recover recent public catalogue if cache is older or missing
+        run: python3 restore_catalogue.py
       - name: Personal RSS alerts (choices come from the private ALERT_SETTINGS secret)
         continue-on-error: true
         run: python3 ozwatch.py --alerts-only
@@ -56,6 +60,8 @@ jobs:
           NTFY_TOPIC: ${{ secrets.NTFY_TOPIC }}
           ALERT_SETTINGS: ${{ secrets.ALERT_SETTINGS }}
       - name: Retailer sale scan (every 30 min)
+        id: retailer
+        continue-on-error: true
         run: python3 stores.py --if-due 28
         env:
           NTFY_TOPIC: ${{ secrets.NTFY_TOPIC }}
@@ -76,7 +82,10 @@ jobs:
       - name: Check if site needs publishing
         id: due
         run: |
-          if [ -f .scanned ] || [ "${{ github.event_name }}" != "schedule" ]; then echo "go=1" >> "$GITHUB_OUTPUT"; fi
+          if [ -f .scanned ] || [ "${{ github.event_name }}" != "schedule" ] || [ "${{ steps.retailer.outcome }}" = "failure" ]; then echo "go=1" >> "$GITHUB_OUTPUT"; fi
+      - name: Report retailer feed failure
+        if: steps.retailer.outcome == 'failure'
+        run: echo "::warning::Retailer feeds failed. Publishing available previous data with original timestamps and direct retailer discovery links."
       - name: Build site
         if: steps.due.outputs.go == '1'
         run: python3 build_site.py
@@ -111,3 +120,11 @@ jobs:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           command: pages deploy site --project-name=${{ vars.CLOUDFLARE_PROJECT_NAME }} --branch=main
+      - name: Verify public pages after Cloudflare deployment
+        if: steps.due.outputs.go == '1' && vars.CLOUDFLARE_PROJECT_NAME != ''
+        env:
+          CF_PROJECT: ${{ vars.CLOUDFLARE_PROJECT_NAME }}
+        run: |
+          for route in / /tech /buyback /refurbished /data/deals.json; do
+            curl --fail --silent --show-error --retry 3 --retry-delay 5 "https://${CF_PROJECT}.pages.dev${route}" --output /dev/null
+          done

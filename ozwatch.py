@@ -41,6 +41,11 @@ STORE_FEEDS = ["amazon.com.au", "jbhifi.com.au", "kmart.com.au", "bigw.com.au", 
     "chemistwarehouse.com.au", "priceline.com.au", "rebelsport.com.au", "dyson.com.au",
     "appliancesonline.com.au", "mwave.com.au", "scorptec.com.au", "pccasegear.com", "umart.com.au",
     "binglee.com.au", "kogan.com", "hp.com", "ebgames.com.au", "centrecom.com.au", "ple.com.au", "reebelo.com.au", "backmarket.com.au", "greengadgets.net.au", "cashconverters.com.au"]
+# Keep new public discovery sources and personal store-feed coverage in sync.
+for manifest in ("tech_sources.json", "buyback_sources.json"):
+    for source in json.loads(Path(__file__).with_name(manifest).read_text())["stores"]:
+        if source["domain"] not in STORE_FEEDS:
+            STORE_FEEDS.append(source["domain"])
 STORE_FEEDS_PER_RUN = 4
 ERROR_WORDS = re.compile(
     r"price[\s-]*error|pricing[\s-]*(error|mistake|glitch)|price[\s-]*mistake|glitch|"
@@ -196,16 +201,19 @@ def condition_label(title):
 
 def tech_matches(title, price, votes):
     """Personal interests, not a claim of historical-low pricing or verified value."""
-    if price is None or votes < TECH_CONFIG.get("minimum_votes", 3):
+    if votes < TECH_CONFIG.get("minimum_votes", 3):
         return []
     matches = []
     for rule in TECH_CONFIG["rules"]:
-        if (price >= rule.get("minimum_price", 0)
+        if (((price is None and rule.get("allow_no_price", False))
+                or (price is not None and price >= rule.get("minimum_price", 0)))
                 and re.search(rule["pattern"], title, re.I)
                 and not (rule.get("exclude") and re.search(rule["exclude"], title, re.I))):
             matches.append(rule["name"])
     # An expensive console is classified once, not also as an accessory.
     if "PS5 consoles" in matches and "Gaming accessories" in matches:
+        matches.remove("Gaming accessories")
+    if "PS5 games" in matches and "Gaming accessories" in matches:
         matches.remove("Gaming accessories")
     return matches
 
@@ -292,7 +300,7 @@ def save_state(s):
 
 def push(title, body, url, urgent, mode="push"):
     if not NTFY_TOPIC or mode == "off":
-        return
+        return False
     priority = private_settings.QUIET_PRIORITY if mode == "quiet" else ("5" if urgent else "3")
     try:
         req = urllib.request.Request(
@@ -300,8 +308,10 @@ def push(title, body, url, urgent, mode="push"):
             headers={"Title": title.encode("ascii", "ignore").decode(), "Click": url,
                      "Priority": priority, "Tags": "rotating_light" if urgent else "moneybag"})
         urllib.request.urlopen(req, timeout=15).read()
+        return True
     except Exception as e:
-        print("  ! ntfy:", e, file=sys.stderr)
+        print("  ! ntfy delivery failed; will retry on a later scan", file=sys.stderr)
+        return False
 
 
 def notify(title, body, url):
@@ -318,7 +328,8 @@ def rotated_stores():
         cursor = int(json.loads(Path(FEED_CURSOR).read_text()).get("next", 0))
     except (OSError, ValueError, TypeError, AttributeError):
         cursor = 0
-    count = min(STORE_FEEDS_PER_RUN, len(STORE_FEEDS))
+    cursor %= len(STORE_FEEDS)
+    count = min(STORE_FEEDS_PER_RUN, len(STORE_FEEDS) - cursor)
     picks = [STORE_FEEDS[(cursor + i) % len(STORE_FEEDS)] for i in range(count)]
     Path(FEED_CURSOR + ".tmp").write_text(json.dumps({"next": (cursor + count) % len(STORE_FEEDS)}))
     os.replace(FEED_CURSOR + ".tmp", FEED_CURSOR)
@@ -364,16 +375,20 @@ def run_once(first_run_silent=False):
             mode = private_settings.mode_for(v["reasons"], SETTINGS)
             if seen_any and mode != "off" and sent >= TECH_CONFIG.get("max_alerts_per_run", 6):
                 continue
-            v["notified"] = True
-            history[alert_key(v["id"])] = time.time()
             if seen_any and mode != "off":  # don't spam on very first run; 'off' types are never sent
                 notify("OzBargain: " + ", ".join(v["reasons"][:2]), v["title"], v["link"])
                 if v["score"] >= NTFY_MIN_SCORE:
-                    push("OzBargain: " + ", ".join(v["reasons"][:2]), v["title"], v["link"],
+                    delivered = push("OzBargain: " + ", ".join(v["reasons"][:2]), v["title"], v["link"],
                          any("ERROR" in r for r in v["reasons"]), mode)
-                sent += 1
+                    sent += 1
+                    if not delivered:
+                        continue
+                else:
+                    sent += 1
                 if not ALERTS_ONLY:
                     print("NEW:", v["reasons"], v["title"])
+            v["notified"] = True
+            history[alert_key(v["id"])] = time.time()
     if ALERTS_ONLY:
         history = {k:v for k,v in history.items() if time.time() - v < 14 * 86400}
         Path(ALERT_STATE + ".tmp").write_text(json.dumps(history))

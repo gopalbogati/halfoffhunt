@@ -1,0 +1,20 @@
+name: checks
+on:
+  pull_request:
+    branches: [main]
+permissions:
+  contents: read
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Regression tests
+        run: python3 -m unittest discover -s tests -v
+      - name: JavaScript syntax
+        run: for file in site_src/*.js; do node --check "$file"; done
+      - name: Build public site
+        run: |
+          python3 restore_catalogue.py
+          python3 build_site.py

@@ -45,7 +45,7 @@ Most Australian Shopify stores expose `https://STORE/collections/sale/products.j
 - Public GitHub issue forms for shopper offers, independent retailer applications and corrections/removal requests. Review submissions before adding any source; GitHub login is required.
 - Confirmed AUD and available variants only; exact variant links; percentage discounts rounded down.
 - Scan coverage, per-deal check time, stale-data warnings, HTTPS-only frontend links and retry state.
-- Six concurrent store scans, isolated store failures, and protection against overwriting the publication on a total scan failure.
+- Three concurrent store scans, isolated store failures, and protection against overwriting the publication on a total scan failure.
 - Pushes to main run tests and publish to the existing GitHub Pages site. The private OzBargain watcher remains separate from public deal content.
 
 ### Validate locally
@@ -71,7 +71,7 @@ Saved deals are local product IDs, not price alerts or price history. The site d
 
 ## Tech discovery and personal alerts
 
-Public `tech.html` now groups 15 official retailer links into laptops, PS5/gaming, PC parts and tech. These links are not a live Amazon/retailer price feed and are not subject to the home page's 50% filter. `tech_sources.json` records the sources researched on 29 September 2026. No price API credentials or paid data service is required for these links.
+Public `tech.html` now groups 21 official source links into laptops, PS5/gaming, PC parts and tech. These links are not a live Amazon/retailer price feed and are not subject to the home page's 50% filter. `tech_sources.json` records the sources researched on 29 September 2026. No price API credentials or paid data service is required for these links.
 
 `site_src/tech-feeds.opml` contains 23 personal RSS subscriptions, including original and used/refurbished store sources plus Computing and Gaming. Import it into your RSS reader. Store RSS routes follow OzBargain's documented `/deals/<domain>/feed` pattern; a store with no posts or unavailable RSS may not return data. This is community coverage, not complete retailer inventory.
 
@@ -84,7 +84,7 @@ python3 ozwatch.py --loop 900 --serve
 
 Mac shortcut: `bash start-private-tech.command`. Stop with Control+C. Your computer must remain awake. No package installation is needed beyond Python 3. The local server serves only the generated dashboard, not repository files. `state.json` and `deals.html` remain ignored by git.
 
-`tech_watch.json` configures laptop, PS5 console, gaming accessory and PC-component matching. Three net votes are required for tech matches; there is no 50% discount requirement. This identifies candidates, not verified good prices. Specific models, membership, shipping, trade-ins, refurbished stock and eligibility still require checking. The existing food and price-error rules remain available. General, computing and gaming feeds run each pass; 4 of the 40 retailer feeds rotate each run, using a persisted cursor so delayed runs cannot skip stores (about 50 minutes per retailer at a five-minute schedule; 150 minutes at the local 15-minute interval, longer if scans are delayed). RSS calls that fail are not bypassed.
+`tech_watch.json` configures laptop, PS5 console, gaming accessory and PC-component matching. Three net votes are required for tech matches; there is no 50% discount requirement. This identifies candidates, not verified good prices. Specific models, membership, shipping, trade-ins, refurbished stock and eligibility still require checking. The existing food and price-error rules remain available. General, computing and gaming feeds run each pass; 4 of the 46 retailer feeds rotate each run, using a persisted cursor so delayed runs cannot skip stores (about 50 minutes per retailer at a five-minute schedule; 150 minutes at the local 15-minute interval, longer if scans are delayed). RSS calls that fail are not bypassed.
 
 GitHub uses `ozwatch.py --alerts-only`: only SHA-256 deal-ID notification fingerprints and timestamps are cached in `private_alert_state.json`; full RSS items, titles and the local dashboard are not cached, logged as new-deal content or uploaded to Pages. Cache prefix `state-v2-` stops restoring legacy caches containing raw private-watcher items. Previously created cache/log objects are not deleted by this change. The first run in the new mode silently establishes a baseline. Future runs select at most six new notifications. `NTFY_TOPIC` is the existing personal channel; no OzBargain content goes to the site's public topic. An unprotected ntfy topic is not an authenticated inbox; do not put sensitive information in it.
 
@@ -97,7 +97,7 @@ GitHub uses `ozwatch.py --alerts-only`: only SHA-256 deal-ID notification finger
 
 ## Used/refurbished tech, affiliate activation and project sharing
 
-`refurbished.html` provides nine official retailer/marketplace discovery sources, condition labels and practical purchase checks. The private watcher labels condition from the title (never assumes an unspecified item is new), matches lower-priced refurbished laptops and includes phones, tablets, audio, wearables, cameras and smart-home tech. It now rotates 40 retailer feeds: ten runs per cycle, about 50 minutes at the five-minute Actions schedule or 150 minutes locally at 15 minutes, plus scan time/delays.
+`refurbished.html` provides nine official retailer/marketplace discovery sources, condition labels and practical purchase checks. The private watcher labels condition from the title (never assumes an unspecified item is new), matches lower-priced refurbished laptops and includes phones, tablets, audio, wearables, cameras and smart-home tech. It now rotates 46 retailer feeds: twelve runs per cycle, about 60 minutes at the five-minute Actions schedule or 180 minutes locally at 15 minutes, plus scan time/delays.
 
 `project.html` is a shareable development showcase with original social artwork, public-beta limitations, repository link, LinkedIn share button and copyable draft. This does not automatically post to LinkedIn.
 
@@ -124,3 +124,18 @@ watch: dyson, lego   # extra words that always match
 ```
 
 Without the variable, alerts use neutral defaults: no home state, food off, no extra words. Unreadable lines are reported in the Actions log by line number only.
+
+
+## Recovery and expanded tech coverage — 5 October 2026
+
+A production scan replaced the catalogue with zero deals when 32 of 33 sources failed or were partial. Failed-source products now retain their original `checked_at` for up to 48 hours, visibly marked **Awaiting recheck**. A successfully rechecked product that no longer qualifies is removed even if another collection fails. Retained products are excluded from new alerts and fresh-product structured data. Retailer 429 responses stop further collection requests to that retailer for the run.
+
+The workflow continues to publish the site and discovery links if retailer scanning fails. It reports that failure as a warning, rather than blocking frontend fixes. Source coverage and timestamps remain visible. The schedule is shifted away from the top of the hour, but GitHub scheduling is **best effort**: observed runs were hours apart. This change cannot guarantee five-minute alerts or overcome retailer rate limiting.
+
+`recovery/deals.json.gz` is a public-only recovery scan (2,542 listings, checked 5 October 2026). `restore_catalogue.py` restores it only when newer than the cached publication and less than 48 hours old; it never refreshes item timestamps. It is not a permanent price feed. Do not add private watcher state or credentials to recovery files.
+
+The public tech directory now includes Computer Alliance, JW Computers, MSY, Mighty Ape AU, PlayStation Store AU and a dedicated PLE storage link. `buyback.html` links to Apple Trade In, JB Hi-Fi Trade-in, Mobile Monster and Cash Converters, distinguishing gift cards, purchase credit and cash. These are discovery/quote links, not live inventory or guaranteed valuations. Existing major and smaller stores remain available.
+
+The private watcher adds PS5 games, desktop/mini PCs, HDD/SSD/NAS storage and technology trade-in/buyback promotions. Rules still require community votes; only trade-in rules allow titles without a price. Failed phone deliveries and retailer alerts exceeding the per-run cap remain eligible for later attempts. The existing private topic and private owner settings are unchanged. Successful retailer deliveries are tracked using destination fingerprints so retrying a failed channel does not repeat the successful phone alert.
+
+Directory pages are generated from `tech_sources.json`, `refurb_sources.json` and `buyback_sources.json`; edit the manifests instead of duplicating cards in HTML. Retailer source feeds rotate with a shorter final batch before restarting the cycle. Unsupported or blocked feeds are reported, never bypassed.
