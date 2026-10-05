@@ -53,3 +53,12 @@ class RecoveryTests(unittest.TestCase):
             target.write_text(json.dumps({'updated':'1970-01-01T00:03:20+00:00','deals':[], 'sources':[{'store':'Failed','status':'partial'}]}))
             self.assertFalse(restore_catalogue.restore(seed,target,now=300,receipt=receipt))
             self.assertEqual(json.loads(target.read_text())['deals'],[])
+
+    def test_successful_empty_scan_consumes_seed_before_later_failure(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root=Path(tmp);seed=root/'seed.gz';target=root/'deals.json';receipt=root/'receipt'
+            seed.write_bytes(gzip.compress(json.dumps({'updated':'1970-01-01T00:01:40+00:00','deals':[{'id':'a','store':'Test','checked_at':100}]}).encode()))
+            for status in ['ok','partial']:
+                target.write_text(json.dumps({'updated':'1970-01-01T00:03:20+00:00','deals':[], 'sources':[{'store':'Test','status':status}]}))
+                self.assertFalse(restore_catalogue.restore(seed,target,now=300,receipt=receipt))
+                self.assertEqual(json.loads(target.read_text())['deals'],[])

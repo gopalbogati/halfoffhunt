@@ -26,6 +26,8 @@ def restore(seed, target, now=None, receipt=None):
                 missing = [dict(d, stale=True) for d in data['deals'] if d.get('store') in failed and d['id'] not in seen
                            and 0 <= now - d.get('checked_at', 0) <= 48 * 3600]
                 if not missing:
+                    if receipt:
+                        receipt.write_text(fingerprint)
                     return False
                 existing['deals'] += missing
                 existing['count'] = len(existing['deals'])
