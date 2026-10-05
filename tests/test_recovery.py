@@ -33,3 +33,23 @@ class RecoveryTests(unittest.TestCase):
             before=target.read_text()
             self.assertFalse(restore_catalogue.restore(seed,target,now=300))
             self.assertEqual(target.read_text(),before)
+
+    def test_newer_partial_cache_recovers_only_failed_stores(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root=Path(tmp);seed=root/'seed.gz';target=root/'deals.json'
+            old=[{'id':'a','store':'Failed','checked_at':100},{'id':'b','store':'Completed','checked_at':100}]
+            seed.write_bytes(gzip.compress(json.dumps({'updated':'1970-01-01T00:01:40+00:00','deals':old}).encode()))
+            target.write_text(json.dumps({'updated':'1970-01-01T00:03:20+00:00','deals':[], 'sources':[{'store':'Failed','status':'partial'},{'store':'Completed','status':'ok'}]}))
+            self.assertTrue(restore_catalogue.restore(seed,target,now=300))
+            result=json.loads(target.read_text())
+            self.assertEqual(result['deals'],[dict(old[0],stale=True)])
+            self.assertEqual(result['updated'],'1970-01-01T00:03:20+00:00')
+
+    def test_seed_is_applied_once_so_removed_products_stay_removed(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root=Path(tmp);seed=root/'seed.gz';target=root/'deals.json';receipt=root/'receipt'
+            seed.write_bytes(gzip.compress(json.dumps({'updated':'1970-01-01T00:01:40+00:00','deals':[{'id':'a','store':'Failed','checked_at':100}]}).encode()))
+            self.assertTrue(restore_catalogue.restore(seed,target,now=200,receipt=receipt))
+            target.write_text(json.dumps({'updated':'1970-01-01T00:03:20+00:00','deals':[], 'sources':[{'store':'Failed','status':'partial'}]}))
+            self.assertFalse(restore_catalogue.restore(seed,target,now=300,receipt=receipt))
+            self.assertEqual(json.loads(target.read_text())['deals'],[])

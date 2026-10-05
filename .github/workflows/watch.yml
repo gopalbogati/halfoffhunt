@@ -48,6 +48,7 @@ jobs:
             private_alert_state.json
             feed_cursor.json
             stores_state.json
+            recovery_receipt.txt
             site/data
             site/feed.xml
           key: state-v2-none
@@ -77,6 +78,7 @@ jobs:
             private_alert_state.json
             feed_cursor.json
             stores_state.json
+            recovery_receipt.txt
             site/data
             site/feed.xml
           key: state-v2-${{ github.run_id }}
