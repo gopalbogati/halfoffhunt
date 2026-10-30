@@ -1,0 +1,651 @@
+{
+  "reviewed": "2026-10-31",
+  "links": [
+    {
+      "retailer_id": "costco",
+      "label": "Warehouse savings",
+      "url": "https://www.costco.com.au/warehouse-savings",
+      "types": [
+        "Groceries",
+        "Home & furniture",
+        "Tech & gaming"
+      ],
+      "kind": "Catalogue & specials"
+    },
+    {
+      "retailer_id": "woolworths",
+      "label": "Half-price specials",
+      "url": "https://www.woolworths.com.au/shop/browse/specials/half-price",
+      "types": [
+        "Groceries",
+        "Cleaning & household",
+        "Health & beauty"
+      ],
+      "kind": "Half-price range"
+    },
+    {
+      "retailer_id": "coles",
+      "label": "Weekly specials & catalogue",
+      "url": "https://www.coles.com.au/on-special",
+      "types": [
+        "Groceries",
+        "Cleaning & household",
+        "Health & beauty"
+      ],
+      "kind": "Sale & offers"
+    },
+    {
+      "retailer_id": "aldi",
+      "label": "Super Savers",
+      "url": "https://www.aldi.com.au/products/super-savers/k/1588161426952145",
+      "types": [
+        "Groceries"
+      ],
+      "kind": "Catalogue & specials"
+    },
+    {
+      "retailer_id": "aldi-special",
+      "label": "Wednesday & Saturday Special Buys",
+      "url": "https://www.aldi.com.au/special-buys",
+      "types": [
+        "Home & furniture",
+        "Tech & gaming",
+        "Clothing & shoes",
+        "Sports & outdoors"
+      ],
+      "kind": "Catalogue & specials"
+    },
+    {
+      "retailer_id": "iga",
+      "label": "Local supermarket specials",
+      "url": "https://www.iga.com.au/",
+      "types": [
+        "Groceries"
+      ],
+      "kind": "Catalogue & specials"
+    },
+    {
+      "retailer_id": "kmart",
+      "label": "Home & living clearance",
+      "url": "https://www.kmart.com.au/category/home-and-living/home-and-living-clearance/",
+      "types": [
+        "Home & furniture"
+      ],
+      "kind": "Clearance"
+    },
+    {
+      "retailer_id": "big-w",
+      "label": "Clearance across the store",
+      "url": "https://www.bigw.com.au/collection/clearance",
+      "types": [
+        "Home & furniture",
+        "Clothing & shoes",
+        "Toys & baby",
+        "Tech & gaming"
+      ],
+      "kind": "Clearance"
+    },
+    {
+      "retailer_id": "target",
+      "label": "Clearance",
+      "url": "https://www.target.com.au/c/clearance/W676714",
+      "types": [
+        "Home & furniture",
+        "Clothing & shoes",
+        "Toys & baby"
+      ],
+      "kind": "Clearance"
+    },
+    {
+      "retailer_id": "myer",
+      "label": "Sale & offers",
+      "url": "https://www.myer.com.au/c/offers",
+      "types": [
+        "Home & furniture",
+        "Clothing & shoes",
+        "Health & beauty",
+        "Toys & baby"
+      ],
+      "kind": "Sale & offers"
+    },
+    {
+      "retailer_id": "david-jones",
+      "label": "Sale",
+      "url": "https://www.davidjones.com/sale",
+      "types": [
+        "Home & furniture",
+        "Clothing & shoes",
+        "Health & beauty"
+      ],
+      "kind": "Sale & offers"
+    },
+    {
+      "retailer_id": "bunnings",
+      "label": "Brand redemption offers",
+      "url": "https://www.bunnings.com.au/campaign/redemption-offers",
+      "types": [
+        "Tools & garden"
+      ],
+      "kind": "Sale & offers"
+    },
+    {
+      "retailer_id": "jb-hifi",
+      "label": "Products on sale",
+      "url": "https://www.jbhifi.com.au/collections/all-products-on-sale",
+      "types": [
+        "Tech & gaming",
+        "Appliances"
+      ],
+      "kind": "Sale & offers"
+    },
+    {
+      "retailer_id": "good-guys",
+      "label": "Daily deals",
+      "url": "https://www.thegoodguys.com.au/deals",
+      "types": [
+        "Tech & gaming",
+        "Appliances"
+      ],
+      "kind": "Sale & offers"
+    },
+    {
+      "retailer_id": "harvey-norman",
+      "label": "Super deals",
+      "url": "https://www.harveynorman.com.au/super-deals",
+      "types": [
+        "Tech & gaming",
+        "Appliances",
+        "Home & furniture"
+      ],
+      "kind": "Sale & offers"
+    },
+    {
+      "retailer_id": "officeworks",
+      "label": "Clearance",
+      "url": "https://www.officeworks.com.au/shop/officeworks/c/clearance",
+      "types": [
+        "Tech & gaming",
+        "Office & stationery",
+        "Home & furniture"
+      ],
+      "kind": "Clearance"
+    },
+    {
+      "retailer_id": "chemist-warehouse",
+      "label": "Retailer specials",
+      "url": "https://www.chemistwarehouse.com.au/",
+      "types": [
+        "Health & beauty",
+        "Toys & baby"
+      ],
+      "kind": "Sale & offers"
+    },
+    {
+      "retailer_id": "priceline",
+      "label": "Sale",
+      "url": "https://www.priceline.com.au/c/sale",
+      "types": [
+        "Health & beauty"
+      ],
+      "kind": "Sale & offers"
+    },
+    {
+      "retailer_id": "ikea",
+      "label": "Offers & clearance",
+      "url": "https://www.ikea.com/au/en/offers/",
+      "types": [
+        "Home & furniture"
+      ],
+      "kind": "Sale & offers"
+    },
+    {
+      "retailer_id": "rebel",
+      "label": "Sale & offers",
+      "url": "https://www.rebelsport.com.au/sale-and-offers",
+      "types": [
+        "Sports & outdoors",
+        "Clothing & shoes"
+      ],
+      "kind": "Sale & offers"
+    },
+    {
+      "retailer_id": "supercheap-auto",
+      "label": "Clearance",
+      "url": "https://www.supercheapauto.com.au/clearance",
+      "types": [
+        "Automotive",
+        "Tools & garden"
+      ],
+      "kind": "Clearance"
+    },
+    {
+      "retailer_id": "amazon-au",
+      "label": "Deals",
+      "url": "https://www.amazon.com.au/events/deals",
+      "types": [
+        "Tech & gaming",
+        "Home & furniture",
+        "Groceries",
+        "Clothing & shoes",
+        "Toys & baby",
+        "Health & beauty"
+      ],
+      "kind": "Sale & offers"
+    },
+    {
+      "retailer_id": "kogan",
+      "label": "Weekly deals",
+      "url": "https://www.kogan.com/au/c/weekly-deals/",
+      "types": [
+        "Tech & gaming",
+        "Appliances",
+        "Home & furniture",
+        "Clothing & shoes"
+      ],
+      "kind": "Sale & offers"
+    },
+    {
+      "retailer_id": "kmart",
+      "label": "All clearance \u2014 every department",
+      "url": "https://www.kmart.com.au/category/clearance/shop-all-clearance/",
+      "types": [
+        "Home & furniture",
+        "Clothing & shoes",
+        "Toys & baby",
+        "Tech & gaming",
+        "Sports & outdoors",
+        "Pets",
+        "Health & beauty"
+      ],
+      "kind": "Clearance"
+    },
+    {
+      "retailer_id": "kmart",
+      "label": "Toys clearance",
+      "url": "https://www.kmart.com.au/category/toys/toys-clearance/",
+      "types": [
+        "Toys & baby"
+      ],
+      "kind": "Clearance"
+    },
+    {
+      "retailer_id": "kmart",
+      "label": "Technology clearance",
+      "url": "https://www.kmart.com.au/category/tech-and-gaming/technology-clearance/",
+      "types": [
+        "Tech & gaming"
+      ],
+      "kind": "Clearance"
+    },
+    {
+      "retailer_id": "kmart",
+      "label": "Women\u2019s clothing clearance",
+      "url": "https://www.kmart.com.au/category/women/clearance-womens-clothing/",
+      "types": [
+        "Clothing & shoes"
+      ],
+      "kind": "Clearance"
+    },
+    {
+      "retailer_id": "kmart",
+      "label": "Kids & baby clearance",
+      "url": "https://www.kmart.com.au/category/kids-and-baby/kids-and-baby-clearance/",
+      "types": [
+        "Clothing & shoes",
+        "Toys & baby"
+      ],
+      "kind": "Clearance"
+    },
+    {
+      "retailer_id": "kmart",
+      "label": "Online-exclusive clearance",
+      "url": "https://www.kmart.com.au/category/online-exclusives/online-exclusives-clearance/",
+      "types": [
+        "Home & furniture",
+        "Sports & outdoors",
+        "Toys & baby"
+      ],
+      "kind": "Clearance"
+    },
+    {
+      "retailer_id": "big-w",
+      "label": "Toys & games clearance",
+      "url": "https://www.bigw.com.au/collection/toys-games-clearance",
+      "types": [
+        "Toys & baby"
+      ],
+      "kind": "Clearance"
+    },
+    {
+      "retailer_id": "target",
+      "label": "Home clearance",
+      "url": "https://www.target.com.au/c/clearance/home/W676715",
+      "types": [
+        "Home & furniture"
+      ],
+      "kind": "Clearance"
+    },
+    {
+      "retailer_id": "target",
+      "label": "Women\u2019s clearance",
+      "url": "https://www.target.com.au/c/clearance/women/W678024",
+      "types": [
+        "Clothing & shoes"
+      ],
+      "kind": "Clearance"
+    },
+    {
+      "retailer_id": "target",
+      "label": "Men\u2019s clearance",
+      "url": "https://www.target.com.au/c/clearance/men/W678023",
+      "types": [
+        "Clothing & shoes"
+      ],
+      "kind": "Clearance"
+    },
+    {
+      "retailer_id": "target",
+      "label": "Appliances clearance",
+      "url": "https://www.target.com.au/c/clearance/W676714?category=W694018",
+      "types": [
+        "Appliances"
+      ],
+      "kind": "Clearance"
+    },
+    {
+      "retailer_id": "myer",
+      "label": "All clearance",
+      "url": "https://www.myer.com.au/c/offers/clearance-offers",
+      "types": [
+        "Home & furniture",
+        "Clothing & shoes",
+        "Health & beauty",
+        "Toys & baby",
+        "Tech & gaming"
+      ],
+      "kind": "Clearance"
+    },
+    {
+      "retailer_id": "david-jones",
+      "label": "Homewares sale",
+      "url": "https://www.davidjones.com/sale/home",
+      "types": [
+        "Home & furniture"
+      ],
+      "kind": "Sale & offers"
+    },
+    {
+      "retailer_id": "david-jones",
+      "label": "Women\u2019s sale",
+      "url": "https://www.davidjones.com/sale/women",
+      "types": [
+        "Clothing & shoes"
+      ],
+      "kind": "Sale & offers"
+    },
+    {
+      "retailer_id": "jb-hifi",
+      "label": "Clearance Corner \u2014 all categories",
+      "url": "https://www.jbhifi.com.au/collections/clearance-corner",
+      "types": [
+        "Tech & gaming",
+        "Appliances"
+      ],
+      "kind": "Clearance"
+    },
+    {
+      "retailer_id": "jb-hifi",
+      "label": "Computers & tablets clearance",
+      "url": "https://www.jbhifi.com.au/collections/computers-tablets/computer-clearance",
+      "types": [
+        "Tech & gaming"
+      ],
+      "kind": "Clearance"
+    },
+    {
+      "retailer_id": "jb-hifi",
+      "label": "Mobile phones clearance",
+      "url": "https://www.jbhifi.com.au/collections/mobile-phones/mobile-phone-clearance",
+      "types": [
+        "Tech & gaming"
+      ],
+      "kind": "Clearance"
+    },
+    {
+      "retailer_id": "jb-hifi",
+      "label": "Audio clearance",
+      "url": "https://www.jbhifi.com.au/collections/headphones-speakers-audio/audio-clearance",
+      "types": [
+        "Tech & gaming"
+      ],
+      "kind": "Clearance"
+    },
+    {
+      "retailer_id": "jb-hifi",
+      "label": "Movies & TV shows clearance",
+      "url": "https://www.jbhifi.com.au/collections/movies-tv-shows/movies-and-tv-shows-on-clearance",
+      "types": [
+        "Entertainment"
+      ],
+      "kind": "Clearance"
+    },
+    {
+      "retailer_id": "jb-hifi",
+      "label": "Music clearance",
+      "url": "https://www.jbhifi.com.au/collections/music-clearance",
+      "types": [
+        "Entertainment"
+      ],
+      "kind": "Clearance"
+    },
+    {
+      "retailer_id": "good-guys",
+      "label": "Clearance & runout",
+      "url": "https://www.thegoodguys.com.au/clearance",
+      "types": [
+        "Tech & gaming",
+        "Appliances"
+      ],
+      "kind": "Clearance"
+    },
+    {
+      "retailer_id": "good-guys",
+      "label": "Laptop deals",
+      "url": "https://www.thegoodguys.com.au/deals/laptops",
+      "types": [
+        "Tech & gaming"
+      ],
+      "kind": "Sale & offers"
+    },
+    {
+      "retailer_id": "good-guys",
+      "label": "TV deals",
+      "url": "https://www.thegoodguys.com.au/deals/tvs",
+      "types": [
+        "Tech & gaming"
+      ],
+      "kind": "Sale & offers"
+    },
+    {
+      "retailer_id": "good-guys",
+      "label": "Washing machine deals",
+      "url": "https://www.thegoodguys.com.au/deals/washing-machines",
+      "types": [
+        "Appliances"
+      ],
+      "kind": "Sale & offers"
+    },
+    {
+      "retailer_id": "harvey-norman",
+      "label": "Clearance \u2014 TV, laptops, appliances & furniture",
+      "url": "https://www.harveynorman.com.au/clearance",
+      "types": [
+        "Tech & gaming",
+        "Appliances",
+        "Home & furniture"
+      ],
+      "kind": "Clearance"
+    },
+    {
+      "retailer_id": "officeworks",
+      "label": "Laptop clearance",
+      "url": "https://www.officeworks.com.au/shop/officeworks/b/clearance-laptops",
+      "types": [
+        "Tech & gaming"
+      ],
+      "kind": "Clearance"
+    },
+    {
+      "retailer_id": "officeworks",
+      "label": "Computers & monitors clearance",
+      "url": "https://www.officeworks.com.au/shop/officeworks/b/clearance-computers-monitors",
+      "types": [
+        "Tech & gaming"
+      ],
+      "kind": "Clearance"
+    },
+    {
+      "retailer_id": "officeworks",
+      "label": "Printers, ink & toner clearance",
+      "url": "https://www.officeworks.com.au/shop/officeworks/b/clearance-printing",
+      "types": [
+        "Office & stationery",
+        "Tech & gaming"
+      ],
+      "kind": "Clearance"
+    },
+    {
+      "retailer_id": "officeworks",
+      "label": "Office supplies clearance",
+      "url": "https://www.officeworks.com.au/shop/officeworks/b/clearance-office-supplies",
+      "types": [
+        "Office & stationery"
+      ],
+      "kind": "Clearance"
+    },
+    {
+      "retailer_id": "chemist-warehouse",
+      "label": "Health & beauty clearance",
+      "url": "https://www.chemistwarehouse.com.au/shop-online/3240/clearance",
+      "types": [
+        "Health & beauty"
+      ],
+      "kind": "Clearance"
+    },
+    {
+      "retailer_id": "chemist-warehouse",
+      "label": "Skincare clearance",
+      "url": "https://www.chemistwarehouse.com.au/shop-online/3677/clearance-skincare",
+      "types": [
+        "Health & beauty"
+      ],
+      "kind": "Clearance"
+    },
+    {
+      "retailer_id": "chemist-warehouse",
+      "label": "Cosmetics clearance",
+      "url": "https://www.chemistwarehouse.com.au/shop-online/3241/clearance-cosmetics",
+      "types": [
+        "Health & beauty"
+      ],
+      "kind": "Clearance"
+    },
+    {
+      "retailer_id": "chemist-warehouse",
+      "label": "Pregnancy & baby clearance",
+      "url": "https://www.chemistwarehouse.com.au/shop-online/3669/clearance-pregnancy-baby",
+      "types": [
+        "Toys & baby"
+      ],
+      "kind": "Clearance"
+    },
+    {
+      "retailer_id": "priceline",
+      "label": "Online-only sale",
+      "url": "https://www.priceline.com.au/c/online-only-sale-offers",
+      "types": [
+        "Health & beauty"
+      ],
+      "kind": "Sale & offers"
+    },
+    {
+      "retailer_id": "ikea",
+      "label": "As-is market \u2014 returned, discontinued & pre-loved",
+      "url": "https://www.ikea.com/au/en/circular/second-hand/",
+      "types": [
+        "Home & furniture"
+      ],
+      "kind": "Outlet & pre-loved"
+    },
+    {
+      "retailer_id": "rebel",
+      "label": "Clearance \u2014 footwear, clothing & equipment",
+      "url": "https://www.rebelsport.com.au/sale-and-offers/clearance",
+      "types": [
+        "Sports & outdoors",
+        "Clothing & shoes"
+      ],
+      "kind": "Clearance"
+    },
+    {
+      "retailer_id": "kogan",
+      "label": "All clearance",
+      "url": "https://www.kogan.com/au/c/clearance/",
+      "types": [
+        "Tech & gaming",
+        "Appliances",
+        "Home & furniture",
+        "Clothing & shoes",
+        "Toys & baby"
+      ],
+      "kind": "Clearance"
+    },
+    {
+      "retailer_id": "kogan",
+      "label": "Home appliances clearance",
+      "url": "https://www.kogan.com/au/c/clearance/home-appliances-3579/",
+      "types": [
+        "Appliances"
+      ],
+      "kind": "Clearance"
+    },
+    {
+      "retailer_id": "kogan",
+      "label": "Home & living clearance",
+      "url": "https://www.kogan.com/au/c/clearance/ma_home-living/",
+      "types": [
+        "Home & furniture"
+      ],
+      "kind": "Clearance"
+    },
+    {
+      "retailer_id": "coles",
+      "label": "Half-price specials",
+      "url": "https://www.coles.com.au/on-special?filter_Special=halfprice",
+      "types": [
+        "Groceries",
+        "Cleaning & household",
+        "Health & beauty"
+      ],
+      "kind": "Half-price range"
+    },
+    {
+      "retailer_id": "coles",
+      "label": "Weekly catalogue",
+      "url": "https://www.coles.com.au/catalogues",
+      "types": [
+        "Groceries"
+      ],
+      "kind": "Catalogue & specials"
+    },
+    {
+      "retailer_id": "aldi",
+      "label": "Weekly catalogue",
+      "url": "https://www.catalogues.aldi.com.au/",
+      "types": [
+        "Groceries"
+      ],
+      "kind": "Catalogue & specials"
+    }
+  ]
+}
