@@ -646,6 +646,109 @@
         "Groceries"
       ],
       "kind": "Catalogue & specials"
+    },
+    {
+      "retailer_id": "kmart",
+      "label": "Christmas gifts & decorations",
+      "url": "https://www.kmart.com.au/christmas/",
+      "types": [
+        "Home & furniture",
+        "Toys & baby",
+        "Clothing & shoes"
+      ],
+      "kind": "Christmas range"
+    },
+    {
+      "retailer_id": "big-w",
+      "label": "Christmas gifts, toys & decorations",
+      "url": "https://www.bigw.com.au/christmas/c/73",
+      "types": [
+        "Home & furniture",
+        "Toys & baby"
+      ],
+      "kind": "Christmas range"
+    },
+    {
+      "retailer_id": "target",
+      "label": "Christmas gifts & festive outfits",
+      "url": "https://www.target.com.au/christmas",
+      "types": [
+        "Home & furniture",
+        "Toys & baby",
+        "Clothing & shoes"
+      ],
+      "kind": "Christmas range"
+    },
+    {
+      "retailer_id": "costco",
+      "label": "Christmas trees, decorations & gifts",
+      "url": "https://www.costco.com.au/Occasions/Christmas/c/cos_40.2",
+      "types": [
+        "Home & furniture",
+        "Toys & baby"
+      ],
+      "kind": "Christmas range"
+    },
+    {
+      "retailer_id": "woolworths",
+      "label": "Christmas budget ideas & specials guide",
+      "url": "https://www.woolworths.com.au/shop/explore/christmas/food/christmas-value-hacks",
+      "types": [
+        "Groceries",
+        "Home & furniture"
+      ],
+      "kind": "Christmas range"
+    },
+    {
+      "retailer_id": "myer",
+      "label": "Boxing Day & end-of-year sale hub",
+      "url": "https://www.myer.com.au/content/boxing-day-sale",
+      "types": [
+        "Home & furniture",
+        "Clothing & shoes",
+        "Health & beauty",
+        "Toys & baby"
+      ],
+      "kind": "Boxing Day & year-end"
+    },
+    {
+      "retailer_id": "jb-hifi",
+      "label": "Boxing Day sale hub",
+      "url": "https://www.jbhifi.com.au/pages/boxing-day-sale",
+      "types": [
+        "Tech & gaming",
+        "Entertainment",
+        "Appliances"
+      ],
+      "kind": "Boxing Day & year-end"
+    },
+    {
+      "retailer_id": "jb-hifi",
+      "label": "End-of-year computer deals",
+      "url": "https://www.jbhifi.com.au/collections/end-of-year-madness-on-computers",
+      "types": [
+        "Tech & gaming"
+      ],
+      "kind": "Boxing Day & year-end"
+    },
+    {
+      "retailer_id": "jb-hifi",
+      "label": "End-of-year headphone deals",
+      "url": "https://www.jbhifi.com.au/collections/end-of-year-madness-on-headphones",
+      "types": [
+        "Tech & gaming"
+      ],
+      "kind": "Boxing Day & year-end"
+    },
+    {
+      "retailer_id": "good-guys",
+      "label": "Boxing Day appliances & tech sale hub",
+      "url": "https://www.thegoodguys.com.au/boxing-day-sale",
+      "types": [
+        "Appliances",
+        "Tech & gaming"
+      ],
+      "kind": "Boxing Day & year-end"
     }
   ]
 }
