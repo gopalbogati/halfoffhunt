@@ -20,7 +20,9 @@
   $('#grocery-filters').onreset = () => { q.value = ''; mode.value = ''; category.value = ''; render(); };
   for (const el of [q, mode, category]) el.addEventListener(el === q ? 'input' : 'change', render);
   fetch('data/groceries.json', {cache:'no-store'}).then(r => { if (!r.ok) throw Error(); return r.json(); }).then(data => {
-    sources = data.sources; render();
+    sources = data.sources;
+    category.innerHTML = '<option value="">All categories</option>' + [...new Set(sources.map(s => s.category))].sort().map(c => `<option>${esc(c)}</option>`).join('');
+    category.value = params.get('category') || ''; render();
     const now = Date.now();
     const catalogues = data.catalogues.filter(c => Date.parse(c.starts_at) <= now && now < Date.parse(c.ends_at) && safe(c.url));
     $('#catalogue-list').innerHTML = catalogues.length ? catalogues.map(c => `<article class="catalogue-card"><div class="mode-tags"><span>MEMBERSHIP REQUIRED</span><span>IN-WAREHOUSE</span></div><h3>${esc(c.title)}</h3><p class="catalogue-dates">${esc(c.date_label)}</p><p>Browse the official catalogue for products, savings and exclusions. Warehouse stock varies.</p><a class="btn" href="${esc(safe(c.url))}" target="_blank" rel="noopener noreferrer">Open catalogue ↗</a><p class="small">Link checked ${esc(new Date(c.checked_at).toLocaleDateString('en-AU', {timeZone:'Australia/Sydney'}))}${c.stale ? ' · refresh unavailable' : ''}</p></article>`).join('') : '<p>No current dated catalogue is available here. <a href="https://www.costco.com.au/warehouse-savings" target="_blank" rel="noopener noreferrer">Check Costco warehouse savings ↗</a></p>';

@@ -86,6 +86,7 @@ def build(out, refresh=True):
         except (OSError, ValueError):
             pass
     sources = json.loads((ROOT / 'grocery_sources.json').read_text())['sources']
+    sources += json.loads((ROOT / 'retailer_sources.json').read_text())['sources']
     data = {'sources': sources, 'catalogues':catalogues, 'catalogue_status':status,
             'generated_at':now.isoformat()}
     (out / 'data').mkdir(parents=True, exist_ok=True)

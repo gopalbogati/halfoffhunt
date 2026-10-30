@@ -1,0 +1,270 @@
+{
+  "sources": [
+    {
+      "id": "kmart",
+      "name": "Kmart",
+      "initials": "K",
+      "colour": "#d12632",
+      "category": "Department stores",
+      "title": "Home & living clearance",
+      "description": "Homewares, storage, bedding and furniture clearance. Also browse Kmart for clothing, toys and everyday essentials.",
+      "url": "https://www.kmart.com.au/category/home-and-living/home-and-living-clearance/",
+      "modes": [
+        "pickup",
+        "delivery",
+        "in-store"
+      ],
+      "note": "Shopping methods apply only to eligible products and locations; confirm stock, fees and offer conditions with the retailer."
+    },
+    {
+      "id": "big-w",
+      "name": "BIG W",
+      "initials": "W",
+      "colour": "#1763ad",
+      "category": "Department stores",
+      "title": "Clearance across the store",
+      "description": "Explore toys, clothing, homewares and other clearance categories. Marketplace products can have different fulfilment rules.",
+      "url": "https://www.bigw.com.au/collection/clearance",
+      "modes": [
+        "pickup",
+        "delivery",
+        "in-store"
+      ],
+      "note": "Shopping methods apply only to eligible products and locations; confirm stock, fees and offer conditions with the retailer."
+    },
+    {
+      "id": "target",
+      "name": "Target",
+      "initials": "T",
+      "colour": "#cc1827",
+      "category": "Department stores",
+      "title": "Clearance",
+      "description": "Browse clothing, home, toys and entertainment clearance. Sizes and local stock can be limited.",
+      "url": "https://www.target.com.au/c/clearance/W676714",
+      "modes": [
+        "pickup",
+        "delivery",
+        "in-store"
+      ],
+      "note": "Shopping methods apply only to eligible products and locations; confirm stock, fees and offer conditions with the retailer."
+    },
+    {
+      "id": "myer",
+      "name": "Myer",
+      "initials": "M",
+      "colour": "#202020",
+      "category": "Department stores",
+      "title": "Sale & offers",
+      "description": "Discover fashion, beauty, homewares and department-store offers. Read brand exclusions and offer dates.",
+      "url": "https://www.myer.com.au/c/offers",
+      "modes": [
+        "pickup",
+        "delivery",
+        "in-store"
+      ],
+      "note": "Shopping methods apply only to eligible products and locations; confirm stock, fees and offer conditions with the retailer."
+    },
+    {
+      "id": "david-jones",
+      "name": "David Jones",
+      "initials": "DJ",
+      "colour": "#282828",
+      "category": "Department stores",
+      "title": "Sale",
+      "description": "Browse fashion, accessories, homewares and selected beauty offers. Availability varies by range and store.",
+      "url": "https://www.davidjones.com/sale",
+      "modes": [
+        "pickup",
+        "delivery",
+        "in-store"
+      ],
+      "note": "Shopping methods apply only to eligible products and locations; confirm stock, fees and offer conditions with the retailer."
+    },
+    {
+      "id": "bunnings",
+      "name": "Bunnings",
+      "initials": "B",
+      "colour": "#07574c",
+      "category": "Home & garden",
+      "title": "Brand redemption offers",
+      "description": "Check tool and garden promotions, bonus products and redemption requirements. Some offers require an in-store purchase.",
+      "url": "https://www.bunnings.com.au/campaign/redemption-offers",
+      "modes": [
+        "in-store"
+      ],
+      "note": "Shopping methods apply only to eligible products and locations; confirm stock, fees and offer conditions with the retailer."
+    },
+    {
+      "id": "jb-hifi",
+      "name": "JB Hi-Fi",
+      "initials": "JB",
+      "colour": "#625300",
+      "category": "Tech & appliances",
+      "title": "Products on sale",
+      "description": "Find electronics, gaming, audio and appliance offers. Compare the exact model and final checkout price.",
+      "url": "https://www.jbhifi.com.au/collections/all-products-on-sale",
+      "modes": [
+        "pickup",
+        "delivery",
+        "in-store"
+      ],
+      "note": "Shopping methods apply only to eligible products and locations; confirm stock, fees and offer conditions with the retailer."
+    },
+    {
+      "id": "good-guys",
+      "name": "The Good Guys",
+      "initials": "GG",
+      "colour": "#16509d",
+      "category": "Tech & appliances",
+      "title": "Daily deals",
+      "description": "Browse appliances, televisions, computers and other offers. Bonus and StoreCash offers have separate conditions.",
+      "url": "https://www.thegoodguys.com.au/deals",
+      "modes": [
+        "pickup",
+        "delivery",
+        "in-store"
+      ],
+      "note": "Shopping methods apply only to eligible products and locations; confirm stock, fees and offer conditions with the retailer."
+    },
+    {
+      "id": "harvey-norman",
+      "name": "Harvey Norman",
+      "initials": "HN",
+      "colour": "#2055a0",
+      "category": "Tech & appliances",
+      "title": "Super deals",
+      "description": "Explore selected electronics, appliances and home offers. Check product-specific terms and delivery charges.",
+      "url": "https://www.harveynorman.com.au/super-deals",
+      "modes": [
+        "pickup",
+        "delivery",
+        "in-store"
+      ],
+      "note": "Shopping methods apply only to eligible products and locations; confirm stock, fees and offer conditions with the retailer."
+    },
+    {
+      "id": "officeworks",
+      "name": "Officeworks",
+      "initials": "OW",
+      "colour": "#134c91",
+      "category": "Tech & office",
+      "title": "Clearance",
+      "description": "Browse computers, office supplies, stationery and furniture clearance. Check local availability before collecting.",
+      "url": "https://www.officeworks.com.au/shop/officeworks/c/clearance",
+      "modes": [
+        "pickup",
+        "delivery",
+        "in-store"
+      ],
+      "note": "Shopping methods apply only to eligible products and locations; confirm stock, fees and offer conditions with the retailer."
+    },
+    {
+      "id": "chemist-warehouse",
+      "name": "Chemist Warehouse",
+      "initials": "CW",
+      "colour": "#b72b30",
+      "category": "Health & beauty",
+      "title": "Retailer specials",
+      "description": "Browse current beauty, personal-care and household offers on the official retailer site. Check the comparison-price basis.",
+      "url": "https://www.chemistwarehouse.com.au/",
+      "modes": [
+        "pickup",
+        "delivery",
+        "in-store"
+      ],
+      "note": "Shopping methods apply only to eligible products and locations; confirm stock, fees and offer conditions with the retailer."
+    },
+    {
+      "id": "priceline",
+      "name": "Priceline",
+      "initials": "P",
+      "colour": "#ba205a",
+      "category": "Health & beauty",
+      "title": "Sale",
+      "description": "Explore beauty, skincare and personal-care specials. Some offers may be online-only or member-only.",
+      "url": "https://www.priceline.com.au/c/sale",
+      "modes": [
+        "pickup",
+        "delivery",
+        "in-store"
+      ],
+      "note": "Shopping methods apply only to eligible products and locations; confirm stock, fees and offer conditions with the retailer."
+    },
+    {
+      "id": "ikea",
+      "name": "IKEA",
+      "initials": "IKEA",
+      "colour": "#164c9a",
+      "category": "Home & garden",
+      "title": "Offers & clearance",
+      "description": "Find furniture and home-accessory offers, including selected IKEA Family deals. Membership terms may apply.",
+      "url": "https://www.ikea.com/au/en/offers/",
+      "modes": [
+        "pickup",
+        "delivery",
+        "in-store"
+      ],
+      "note": "Shopping methods apply only to eligible products and locations; confirm stock, fees and offer conditions with the retailer."
+    },
+    {
+      "id": "rebel",
+      "name": "rebel",
+      "initials": "r",
+      "colour": "#292929",
+      "category": "Sports & outdoors",
+      "title": "Sale & offers",
+      "description": "Browse sportswear, footwear and fitness equipment offers. Check sizes, member conditions and local stock.",
+      "url": "https://www.rebelsport.com.au/sale-and-offers",
+      "modes": [
+        "pickup",
+        "delivery",
+        "in-store"
+      ],
+      "note": "Shopping methods apply only to eligible products and locations; confirm stock, fees and offer conditions with the retailer."
+    },
+    {
+      "id": "supercheap-auto",
+      "name": "Supercheap Auto",
+      "initials": "SCA",
+      "colour": "#a31d27",
+      "category": "Automotive",
+      "title": "Clearance",
+      "description": "Explore tools, car accessories and automotive clearance. Some clearance products are pickup-only.",
+      "url": "https://www.supercheapauto.com.au/clearance",
+      "modes": [
+        "pickup",
+        "delivery",
+        "in-store"
+      ],
+      "note": "Shopping methods apply only to eligible products and locations; confirm stock, fees and offer conditions with the retailer."
+    },
+    {
+      "id": "amazon-au",
+      "name": "Amazon AU",
+      "initials": "a",
+      "colour": "#354052",
+      "category": "Online marketplaces",
+      "title": "Deals",
+      "description": "Browse offers across tech, home, pantry and other categories. Check the seller, shipping fees and any Prime requirements.",
+      "url": "https://www.amazon.com.au/events/deals",
+      "modes": [
+        "delivery"
+      ],
+      "note": "Shopping methods apply only to eligible products and locations; confirm stock, fees and offer conditions with the retailer."
+    },
+    {
+      "id": "kogan",
+      "name": "Kogan",
+      "initials": "k",
+      "colour": "#b02a2e",
+      "category": "Online marketplaces",
+      "title": "Weekly deals",
+      "description": "Browse electronics, appliances, home and marketplace deals. Check seller details, delivery fees and member pricing.",
+      "url": "https://www.kogan.com/au/c/weekly-deals/",
+      "modes": [
+        "delivery"
+      ],
+      "note": "Shopping methods apply only to eligible products and locations; confirm stock, fees and offer conditions with the retailer."
+    }
+  ]
+}

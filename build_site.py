@@ -31,6 +31,15 @@ for name in os.listdir(src):
             manifest = {"tech.html": "tech_sources.json", "refurbished.html": "refurb_sources.json", "buyback.html": "buyback_sources.json"}.get(name)
             if manifest:
                 s = render_directory(s, json.loads(Path(HERE, manifest).read_text())["stores"])
+            if name == 'stores.html':
+                from html import escape
+                import re
+                existing = set(re.findall(r'<h2>(.*?)</h2>', s))
+                extra = []
+                for retailer in json.loads(Path(HERE, 'retailer_sources.json').read_text())['sources']:
+                    if escape(retailer['name']) not in existing:
+                        extra.append(f'<article class="store-tile"><h2>{escape(retailer["name"])}</h2><p>{escape(retailer["category"])} · Direct retailer link</p><a href="{escape(retailer["url"])}" target="_blank" rel="noopener noreferrer">Browse offers ↗</a></article>')
+                s = s.replace('<!--ADDITIONAL_RETAILERS-->', ''.join(extra))
             s = rewrite_html(s, affiliates)
             for asset in ("app.js", "groceries.js", "tech.js", "buyback.js", "share.js", "share-deal.js", "style.css"):
                 digest = hashlib.sha256(open(os.path.join(src, asset), "rb").read()).hexdigest()[:12]
