@@ -81,7 +81,7 @@
       ? list.slice(0, state.shown).map(card).join("")
       : degraded && !deals.length
         ? '<div class="empty"><h3>Retailer feeds are temporarily unavailable</h3><p>This does not mean there are no sales. Browse <a href="tech.html">tech and PS5 offers</a>, <a href="refurbished.html">used and refurbished tech</a>, <a href="buyback.html">trade-in and buyback services</a> or <a href="stores.html">all stores</a> directly while scans recover.</p></div>'
-        : '<div class="empty">No deals match those filters right now. Try clearing filters or browsing the store directory.</div>';
+        : '<div class="empty"><h3>No 50%+ deals match this search</h3><p>Offers below 50% off may still be available through these official retailer directories.</p><div class="empty-links"><a href="tech.html">Laptops &amp; tech offers →</a><a href="groceries.html">Groceries &amp; Costco →</a><a href="refurbished.html">Used &amp; refurbished →</a></div></div>';
     $("#more").hidden = list.length <= state.shown;
     $("#result").textContent = `${list.length.toLocaleString()} deal${list.length === 1 ? "" : "s"}` +
       (state.cat !== "all" ? ` in ${state.cat === "errors" ? "possible pricing errors" : state.cat}` : "") +

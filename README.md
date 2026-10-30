@@ -150,3 +150,7 @@ The initial example is iPhone 14 Pro Max 256GB, working with light wear and batt
 Visitors can start a comparison for any other device and add their own matching quotes; those entries remain in browser storage. These inputs do not sell a device, submit personal information to a buyer, or activate automatic valuation monitoring. New provider/API connections are still needed for continuous all-device quote coverage. The public examples require manual rechecking and retain their original timestamps across builds.
 
 Run the comparison regression tests with `node --test tests/*.test.js`.
+
+## Grocery and warehouse offers
+
+Open `/groceries` for Costco warehouse catalogues and official Woolworths, Coles, ALDI and IGA specials. Search and filter by pickup, delivery or in-store shopping. `grocery_sources.json` maintains retailer links; `grocery.py` discovers current dated Costco catalogues during builds. `grocery_catalogues.json` is a timestamped fallback, never a substitute for current product prices. Expired catalogues are hidden automatically. Use `GROCERY_OFFLINE=1 python3 build_site.py` for a deterministic offline build. See [coverage and validation](docs/2026-10-30-grocery-update.md).

@@ -1,0 +1,26 @@
+{
+  "catalogues": [
+    {
+      "id": "0757651001791853004",
+      "store": "costco",
+      "title": "Spring Savings",
+      "url": "https://viewer.joomag.com/spring-savings-29-10-26-15-11-26/0757651001791853004",
+      "starts_at": "2026-10-29T00:00:00+11:00",
+      "ends_at": "2026-11-16T00:00:00+11:00",
+      "date_label": "29 Oct \u2013 15 Nov 2026",
+      "checked_at": "2026-10-30T11:52:50.003358+00:00",
+      "stale": false
+    },
+    {
+      "id": "0314771001791333283",
+      "store": "costco",
+      "title": "In Warehouse Savings",
+      "url": "https://viewer.joomag.com/in-warehouse-savings-26-10-26-22-11-26/0314771001791333283",
+      "starts_at": "2026-10-26T00:00:00+11:00",
+      "ends_at": "2026-11-23T00:00:00+11:00",
+      "date_label": "26 Oct \u2013 22 Nov 2026",
+      "checked_at": "2026-10-30T11:52:50.003358+00:00",
+      "stale": false
+    }
+  ]
+}
