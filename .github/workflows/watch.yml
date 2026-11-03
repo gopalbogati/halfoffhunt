@@ -123,11 +123,14 @@ jobs:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           command: pages deploy site --project-name=${{ vars.CLOUDFLARE_PROJECT_NAME }} --branch=main
-      - name: Verify public pages after Cloudflare deployment
+      - name: Verify pages stay private after Cloudflare deployment
         if: steps.due.outputs.go == '1' && vars.CLOUDFLARE_PROJECT_NAME != ''
         env:
           CF_PROJECT: ${{ vars.CLOUDFLARE_PROJECT_NAME }}
         run: |
-          for route in / /clearance /groceries /tech /buyback /refurbished /data/deals.json /data/groceries.json /data/buyback.json; do
-            curl --fail --silent --show-error --retry 3 --retry-delay 5 "https://${CF_PROJECT}.pages.dev${route}" --output /dev/null
+          # functions/_middleware.js locks the site; every route must answer 401 without the login
+          sleep 10
+          for route in / /clearance /groceries /tech /buyback /refurbished /data/deals.json /data/groceries.json /data/buyback.json /feed.xml; do
+            code=$(curl --silent --retry 3 --retry-delay 5 -o /dev/null -w '%{http_code}' "https://${CF_PROJECT}.pages.dev${route}")
+            if [ "$code" != "401" ]; then echo "::error::${route} returned ${code}, expected 401 (site should be private)"; exit 1; fi
           done
